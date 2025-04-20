@@ -33,7 +33,7 @@ public class MainView extends JFrame {
 		contentPane.add(mainContentPanel, BorderLayout.CENTER);
 
 		// 🔹 Add views to the CardLayout
-		mainContentPanel.add(new DashboardPanel(new DashboardController()), "Dashboard");
+		mainContentPanel.add(new AdminDashboardPanel(new DashboardController()), "Dashboard");
 		mainContentPanel.add(new TransactionsPanel(), "Transactions");
 		// Add more panels later: e.g. mainContentPanel.add(new CustomerPanel(), "Customers");
 

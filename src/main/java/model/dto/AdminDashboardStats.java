@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 
 public class AdminDashboardStats {
 
-	private int customers;
-	private int accounts;
+	private long customers;
+	private long accounts;
 	private BigDecimal bankBalance;
-	private int pendingTransactions;
+	private long pendingTransactions;
 
-	public AdminDashboardStats(int customers, int accounts, BigDecimal bankBalance, int pendingTransactions) {
+	public AdminDashboardStats(long customers, long accounts, BigDecimal bankBalance, long pendingTransactions) {
 		super();
 		this.customers = customers;
 		this.accounts = accounts;
@@ -17,11 +17,11 @@ public class AdminDashboardStats {
 		this.pendingTransactions = pendingTransactions;
 	}
 
-	public int getCustomers() {
+	public long getCustomers() {
 		return customers;
 	}
 
-	public int getAccounts() {
+	public long getAccounts() {
 		return accounts;
 	}
 
@@ -29,7 +29,7 @@ public class AdminDashboardStats {
 		return bankBalance;
 	}
 
-	public int getPendingTransactions() {
+	public long getPendingTransactions() {
 		return pendingTransactions;
 	}
 
