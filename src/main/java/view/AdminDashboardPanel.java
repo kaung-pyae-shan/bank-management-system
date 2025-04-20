@@ -32,7 +32,7 @@ public class AdminDashboardPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JLabel customerLabel, accountLabel, balanceLabel, pendingLabel;
+	private JLabel customerValueLabel, accountValueLabel, balanceValueLabel, pendingValueLabel;
 
 	public AdminDashboardPanel(DashboardController controller) {
 		setLayout(new BorderLayout(20, 20));
@@ -52,22 +52,22 @@ public class AdminDashboardPanel extends JPanel {
 		   Section: Stats
 		   ========================== */
 		// Fetching Stats Data
-		customerLabel = new JLabel();
-		accountLabel = new JLabel();
-		balanceLabel = new JLabel();
-		pendingLabel = new JLabel();
+		customerValueLabel = new JLabel();
+		accountValueLabel = new JLabel();
+		balanceValueLabel = new JLabel();
+		pendingValueLabel = new JLabel();
 
 		AdminDashboardStats stats = controller.fetchAdminDashboardStats();
-		customerLabel.setText(String.valueOf(stats.getCustomers()));
-		accountLabel.setText(String.valueOf(stats.getAccounts()));
-		balanceLabel.setText(stats.getBankBalance().toString());
-		pendingLabel.setText(String.valueOf(stats.getPendingTransactions()));
+		customerValueLabel.setText(String.valueOf(stats.getCustomers()));
+		accountValueLabel.setText(String.valueOf(stats.getAccounts()));
+		balanceValueLabel.setText(stats.getBankBalance().toString());
+		pendingValueLabel.setText(String.valueOf(stats.getPendingTransactions()));
 
 		// Styling Stats Box Panels
-		JPanel customerStatsPanel = createStatBox("Total Customers", customerLabel);
-		JPanel accountStatsPanel = createStatBox("Total Accounts", accountLabel);
-		JPanel balanceStatsPanel = createStatBox("Bank Balance", balanceLabel);
-		JPanel pendingStatsPanel = createStatBox("Pending Transactions", pendingLabel);
+		JPanel customerStatsPanel = createStatBox("Total Customers", customerValueLabel);
+		JPanel accountStatsPanel = createStatBox("Total Accounts", accountValueLabel);
+		JPanel balanceStatsPanel = createStatBox("Bank Balance", balanceValueLabel);
+		JPanel pendingStatsPanel = createStatBox("Pending Transactions", pendingValueLabel);
 
 		customerStatsPanel.setBackground(new Color(0x5fa8d3));
 		accountStatsPanel.setBackground(new Color(0x9b5de5));
@@ -127,6 +127,9 @@ public class AdminDashboardPanel extends JPanel {
 				Object trxIdObj = model.getValueAt(row, 0); // get trxID from table
 				int trxId = Integer.parseInt(trxIdObj.toString());
 				controller.updateTransactionStatus(trxId, TransactionStatus.APPROVED);
+				pendingValueLabel.setText(
+						String.valueOf(controller.fetchAdminDashboardStats().getPendingTransactions()
+						)); // Update the Pending Stats value
 				model.removeRow(row);
 			}
 
@@ -139,6 +142,9 @@ public class AdminDashboardPanel extends JPanel {
 				Object trxIdObj = model.getValueAt(row, 0); // get trxId from table
 				int trxId = Integer.parseInt(trxIdObj.toString());
 				controller.updateTransactionStatus(trxId, TransactionStatus.REJECTED);
+				pendingValueLabel.setText(
+						String.valueOf(controller.fetchAdminDashboardStats().getPendingTransactions()
+						)); // Update the Pending Stats value
 				model.removeRow(row);
 			}
 		};
