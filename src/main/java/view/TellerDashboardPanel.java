@@ -24,17 +24,19 @@ import controller.DashboardController;
 import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
 import model.dto.PendingTransaction;
+import model.dto.RecentTransaction;
+import model.dto.TellerDashboardStats;
 import view.components.dashboard.TableActionCellEditor;
 import view.components.dashboard.TableActionCellRender;
 import view.components.dashboard.TableActionEvent;
 
-public class AdminDashboardPanel extends JPanel {
+public class TellerDashboardPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	
-	private JLabel customerValueLabel, accountValueLabel, balanceValueLabel, pendingValueLabel;
 
-	public AdminDashboardPanel(DashboardController controller) {
+	private JLabel customerValueLabel, accountValueLabel, cardValueLabel, transactionValueLabel;
+
+	public TellerDashboardPanel(DashboardController controller) {
 		setLayout(new BorderLayout(20, 20));
 		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -43,7 +45,7 @@ public class AdminDashboardPanel extends JPanel {
 		   ========================== */
 		// Header panel with welcome and date
 		JPanel topPanel = new JPanel(new BorderLayout());
-		JLabel welcomeLabel = new JLabel("Welcome, Admin John Doe!");
+		JLabel welcomeLabel = new JLabel("Welcome, Teller Jame Smith!");
 		JLabel dateLabel = new JLabel(LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy EEEE")));
 		topPanel.add(welcomeLabel, BorderLayout.WEST);
 		topPanel.add(dateLabel, BorderLayout.EAST);
@@ -54,60 +56,64 @@ public class AdminDashboardPanel extends JPanel {
 		// Fetching Stats Data
 		customerValueLabel = new JLabel();
 		accountValueLabel = new JLabel();
-		balanceValueLabel = new JLabel();
-		pendingValueLabel = new JLabel();
+		cardValueLabel = new JLabel();
+		transactionValueLabel = new JLabel();
 
-		AdminDashboardStats stats = controller.fetchAdminDashboardStats();
+		// --------------------------------------- Add Login Staff Id ----------------------------
+		TellerDashboardStats stats = controller.fetchTellerDashboardStats(1);
+		// --------------------------------------- Add Login Staff Id ----------------------------
 		customerValueLabel.setText(String.valueOf(stats.getCustomers()));
 		accountValueLabel.setText(String.valueOf(stats.getAccounts()));
-		balanceValueLabel.setText(stats.getBankBalance().toString());
-		pendingValueLabel.setText(String.valueOf(stats.getPendingTransactions()));
+		cardValueLabel.setText(String.valueOf(stats.getCards()));
+		transactionValueLabel.setText(String.valueOf(stats.getTransactionTodays()));
 
 		// Styling Stats Box Panels
-		JPanel customerStatsPanel = createStatBox("Total Customers", customerValueLabel);
-		JPanel accountStatsPanel = createStatBox("Total Accounts", accountValueLabel);
-		JPanel balanceStatsPanel = createStatBox("Bank Balance", balanceValueLabel);
-		JPanel pendingStatsPanel = createStatBox("Pending Transactions", pendingValueLabel);
+		JPanel customerStatsPanel = createStatBox("Customers you created", customerValueLabel);
+		JPanel accountStatsPanel = createStatBox("Accounts you created", accountValueLabel);
+		JPanel cardStatsPanel = createStatBox("Card you issued", cardValueLabel);
+		JPanel transactionStatsPanel = createStatBox("Transactions today", transactionValueLabel);
 
 		customerStatsPanel.setBackground(new Color(0x5fa8d3));
 		accountStatsPanel.setBackground(new Color(0x9b5de5));
-		balanceStatsPanel.setBackground(new Color(0xe5383b));
-		pendingStatsPanel.setBackground(new Color(0xf17300));
+		cardStatsPanel.setBackground(new Color(0xe5383b));
+		transactionStatsPanel.setBackground(new Color(0xf17300));
 
 		// Stats section
 		JPanel statsPanel = new JPanel(new GridLayout(2, 2, 20, 20));
 		statsPanel.setPreferredSize(new Dimension(600, 300));
 		statsPanel.add(customerStatsPanel);
 		statsPanel.add(accountStatsPanel);
-		statsPanel.add(balanceStatsPanel);
-		statsPanel.add(pendingStatsPanel);
+		statsPanel.add(cardStatsPanel);
+		statsPanel.add(transactionStatsPanel);
 
 		/* ==========================
-		   Section: Pending Transactions
+		   Section: Recent Transactions
 		   ========================== */
-		// Pending Transactions Label
-		JLabel pendingLabel = new JLabel("Pending Transactions");
-		pendingLabel.setFont(new Font("Arial", Font.BOLD, 14));
-		pendingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		// Recent Transactions Label
+		JLabel recentLabel = new JLabel("Recent Transactions");
+		recentLabel.setFont(new Font("Arial", Font.BOLD, 14));
+		recentLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		// Fetch the data from the controller
-		List<PendingTransaction> transactions = controller.fetchAdminDashboardTable();
+		// --------------------------------------- Add Login Staff Id ----------------------------
+		List<RecentTransaction> transactions = controller.fetchTellerDashboardTable(1);
+		// --------------------------------------- Add Login Staff Id ----------------------------
 
 		// Define the column names
-		String[] columns = { "Trx Id", "Customer", "Type", "Amount", "Date", "Action" };
+		String[] columns = { "Trx Id", "Customer", "Type", "Amount", "Date", "Status" };
 
 		// Create the DefaultTableModel without specifying the number of rows
 		DefaultTableModel model = new DefaultTableModel(columns, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				// Allow editing only for the last column (Action column)
-				return column == columns.length - 1;
+				// Disable table editing
+				return false;
 			}
 		};
 
 		// Add rows to the model
-		for (PendingTransaction trx : transactions) {
+		for (RecentTransaction trx : transactions) {
 			model.addRow(trx.toObject());
 		}
 
@@ -115,41 +121,6 @@ public class AdminDashboardPanel extends JPanel {
 		JTable table = new JTable(model);
 		table.getTableHeader().setReorderingAllowed(false); // Disable column reordering
 		table.setRowHeight(40);
-
-		TableActionEvent event = new TableActionEvent() {
-			@Override
-			public void onApprove(int row) {
-				if (table.isEditing()) {
-					table.getCellEditor().stopCellEditing();
-				}
-				
-				DefaultTableModel model = (DefaultTableModel) table.getModel();
-				Object trxIdObj = model.getValueAt(row, 0); // get trxID from table
-				int trxId = Integer.parseInt(trxIdObj.toString());
-				controller.updateTransactionStatus(trxId, TransactionStatus.APPROVED);
-				pendingValueLabel.setText(
-						String.valueOf(controller.fetchAdminDashboardStats().getPendingTransactions()
-						)); // Update the Pending Stats value
-				model.removeRow(row);
-			}
-
-			@Override
-			public void onReject(int row) {
-				if (table.isEditing()) {
-					table.getCellEditor().stopCellEditing();
-				}
-				DefaultTableModel model = (DefaultTableModel) table.getModel();
-				Object trxIdObj = model.getValueAt(row, 0); // get trxId from table
-				int trxId = Integer.parseInt(trxIdObj.toString());
-				controller.updateTransactionStatus(trxId, TransactionStatus.REJECTED);
-				pendingValueLabel.setText(
-						String.valueOf(controller.fetchAdminDashboardStats().getPendingTransactions()
-						)); // Update the Pending Stats value
-				model.removeRow(row);
-			}
-		};
-		table.getColumnModel().getColumn(5).setCellRenderer(new TableActionCellRender());
-		table.getColumnModel().getColumn(5).setCellEditor(new TableActionCellEditor(event));
 
 		// Create a JScrollPane and add the table to it
 		JScrollPane tableScroll = new JScrollPane(table);
@@ -160,7 +131,7 @@ public class AdminDashboardPanel extends JPanel {
 		centerPanel.add(Box.createVerticalStrut(10));
 		centerPanel.add(statsPanel);
 		centerPanel.add(Box.createVerticalStrut(60));
-		centerPanel.add(pendingLabel);
+		centerPanel.add(recentLabel);
 		centerPanel.add(Box.createVerticalStrut(10));
 		centerPanel.add(tableScroll);
 
@@ -188,4 +159,5 @@ public class AdminDashboardPanel extends JPanel {
 
 		return box;
 	}
+
 }

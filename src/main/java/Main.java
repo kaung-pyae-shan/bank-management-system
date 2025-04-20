@@ -1,6 +1,6 @@
 import javax.swing.SwingUtilities;
 
-import view.MainView;
+import view.common.MainView;
 
 public class Main {
 

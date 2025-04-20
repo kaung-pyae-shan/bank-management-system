@@ -5,6 +5,8 @@ import java.util.List;
 import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
 import model.dto.PendingTransaction;
+import model.dto.RecentTransaction;
+import model.dto.TellerDashboardStats;
 import service.DashboardService;
 
 public class DashboardController {
@@ -19,11 +21,21 @@ public class DashboardController {
 		return service.getAdminDashboardStats();
 	}
 	
-	public List<PendingTransaction> FetchAdminDashboardTable() {
+	public List<PendingTransaction> fetchAdminDashboardTable() {
 		return service.getPendingTransactions();
 	}
 	
 	public int updateTransactionStatus(int trxId, TransactionStatus status) {
 		return service.changeTransactionStatus(trxId, status);
+	}
+	
+	public TellerDashboardStats fetchTellerDashboardStats(int staffId) {
+		return service.getTellerDashboardStats(staffId);
+//		return new TellerDashboardStats(0, 0, 0, 0);
+	}
+	
+	public List<RecentTransaction> fetchTellerDashboardTable(int staffId) {
+//		return List.of(new RecentTransaction(9, "John", TransactionType.DEPOSIT, new BigDecimal(100000.00), LocalDateTime.now(), TransactionStatus.APPROVED));
+		return service.getRecentTransactions(staffId);
 	}
 }

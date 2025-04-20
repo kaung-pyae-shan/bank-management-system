@@ -9,10 +9,11 @@ import config.DatabaseConfig;
 import model.Transaction.TransactionStatus;
 import model.Transaction.TransactionType;
 import model.dto.PendingTransaction;
+import model.dto.RecentTransaction;
 
 public class DashboardRepository {
 
-	public long countCustomers() {
+	public long countTotalCustomers() {
 		final String sql = "SELECT COUNT(*) FROM customers";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			var rs = stmt.executeQuery();
@@ -25,7 +26,7 @@ public class DashboardRepository {
 		return 0L;
 	}
 
-	public long countAccounts() {
+	public long countTotalAccounts() {
 		final String sql = "SELECT COUNT(*) FROM accounts";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			var rs = stmt.executeQuery();
@@ -99,7 +100,7 @@ public class DashboardRepository {
 			}
 			return pendings;
 		} catch (Exception e) {
-			System.out.println("Failed to fetch Pending transactions count");
+			System.out.println("Failed to fetch Pending transactions");
 		}
 		return null;
 	}
@@ -113,6 +114,115 @@ public class DashboardRepository {
 			return row;
 		} catch (Exception e) {
 			System.out.println("Failed to fetch Pending transactions count");
+		}
+		return 0;
+	}
+	
+	public List<RecentTransaction> searchLast24HrTransactionsByStaffId(int staffId) {
+		final String sql = """
+				SELECT
+				    t.transaction_id,
+				    c.name AS customer_name,
+				    t.transaction_type,
+				    t.amount,
+				    t.transaction_date,
+				    t.status
+				FROM
+				    transactions t
+				JOIN
+				    accounts a ON t.from_account_id = a.account_id OR t.to_account_id = a.account_id
+				JOIN
+				    customer_accounts ca ON a.account_id = ca.account_id
+				JOIN
+				    customers c ON ca.customer_id = c.customer_id
+				WHERE 
+					transaction_date >= NOW() - INTERVAL 24 HOUR and processed_by = ?;
+								""";
+		List<RecentTransaction> recents = new ArrayList<>();
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, staffId);
+			var rs = stmt.executeQuery();
+			while(rs.next()) {
+				int trxId = rs.getInt(1);
+				String cusName = rs.getString(2);
+				TransactionType trxType = TransactionType.valueOf(rs.getString(3));
+				BigDecimal amount = rs.getBigDecimal(4);
+				LocalDateTime trxTime = rs.getTimestamp(5).toLocalDateTime();
+				TransactionStatus trxStatus = TransactionStatus.valueOf(rs.getString(6));
+				recents.add(new RecentTransaction(trxId, cusName, trxType, amount, trxTime, trxStatus));
+			}
+			return recents;
+		} catch (Exception e) {
+			System.out.println("Failed to fetch Recent transactions");
+		}
+		return null;
+	}
+
+	public long countCustomersByStaffId(int staffId) {
+		final String sql = "SELECT COUNT(*) FROM customers where created_by = ?";
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, staffId);
+			var rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getLong(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Failed to fetch customers count");
+		}
+		return 0;
+	}
+
+	public long countAccountsByStaffId(int staffId) {
+		final String sql = "SELECT COUNT(*) FROM accounts where created_by = ?";
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, staffId);
+			var rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getLong(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Failed to fetch accounts count");
+		}
+		return 0;
+	}
+
+	public long countCardsByStaffId(int staffId) {
+		final String sql = "SELECT COUNT(*) FROM cards where issued_by = ?";
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, staffId);
+			var rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getLong(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Failed to fetch cards count");
+		}
+		return 0;
+	}
+
+	public long countTodayTransactionsByStaffId(int staffId) {
+		final String sql = """
+				SELECT
+				    COUNT(*)
+				FROM
+				    transactions t
+				JOIN
+				    accounts a ON t.from_account_id = a.account_id OR t.to_account_id = a.account_id
+				JOIN
+				    customer_accounts ca ON a.account_id = ca.account_id
+				JOIN
+				    customers c ON ca.customer_id = c.customer_id
+				WHERE 
+					DATE(transaction_date) = CURDATE() and processed_by = ?;
+								""";
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, staffId);
+			var rs = stmt.executeQuery();
+			if (rs.next()) {
+				return rs.getLong(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Failed to fetch today transactions count");
 		}
 		return 0;
 	}

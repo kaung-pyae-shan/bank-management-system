@@ -4,23 +4,48 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
-public class MenuPanel extends JPanel {
+public class AdminMenuPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	public MenuPanel(Consumer<String> navCallback) {
+	public AdminMenuPanel(Consumer<String> navCallback) {
 		setBackground(new Color(0x353535));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setPreferredSize(new Dimension(300, 700));
+		
+		add(Box.createVerticalStrut(40));
+		
+		// Create and configure the logo text area
+        JTextArea logoTextArea = new JTextArea("Bank Management System");
+        logoTextArea.setForeground(Color.WHITE);
+        logoTextArea.setBackground(new Color(0x353535)); // Same as sidebar
+        logoTextArea.setLineWrap(true); // Enable line wrapping
+        logoTextArea.setWrapStyleWord(true); // Wrap at word boundaries
+        logoTextArea.setEditable(false); // Make it non-editable
+        logoTextArea.setOpaque(false); // Make it transparent
+        logoTextArea.setFont(new Font("Arial", Font.BOLD, 24)); // Set font
+        logoTextArea.setAlignmentX(Component.CENTER_ALIGNMENT); // Center the text area
+
+        // Set preferred size for the text area
+        logoTextArea.setPreferredSize(new Dimension(280, 60)); // Adjust height as needed
+        logoTextArea.setMaximumSize(new Dimension(280, 60)); // Adjust height as needed
+
+        // Add the logo text area to the panel
+        add(logoTextArea);
 
 		// Top padding
-		add(Box.createVerticalStrut(80));
+		add(Box.createVerticalStrut(50));
 
 		// Nav buttons
 		addNavButton("Dashboard", navCallback);
-		addNavButton("Customers", navCallback);
-		addNavButton("Accounts", navCallback);
+		addNavButton("User Management", navCallback);
+		addNavButton("Customer Management", navCallback);
+		addNavButton("Account Management", navCallback);
+		addNavButton("Card Management", navCallback);
 		addNavButton("Transactions", navCallback);
+		addNavButton("Interest Management", navCallback);
+		addNavButton("Transaction Logs", navCallback);
+		addNavButton("Account Status Control", navCallback);
 
 		// Push everything above up
 		add(Box.createVerticalGlue());
@@ -34,8 +59,8 @@ public class MenuPanel extends JPanel {
 	private void addNavButton(String name, Consumer<String> callback) {
 		JButton button = new JButton(name);
 		button.setAlignmentX(Component.CENTER_ALIGNMENT);
-		button.setPreferredSize(new Dimension(300, 60)); // Set preferred size
-        button.setMaximumSize(new Dimension(300, 60)); // Set maximum size
+		button.setPreferredSize(new Dimension(300, 40)); // Set preferred size
+        button.setMaximumSize(new Dimension(300, 40)); // Set maximum size
         
      // Make the button background transparent
         button.setOpaque(true); // Make the button opaque
