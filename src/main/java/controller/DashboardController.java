@@ -13,8 +13,8 @@ public class DashboardController {
 
 	private DashboardService service;
 	
-	public DashboardController() {
-		service = new DashboardService();
+	public DashboardController(DashboardService service) {
+		this.service = service;
 	}
 	
 	public AdminDashboardStats fetchAdminDashboardStats() {

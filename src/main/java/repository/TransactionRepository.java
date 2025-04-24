@@ -8,51 +8,11 @@ import java.util.List;
 import config.DatabaseConfig;
 import model.Transaction.TransactionStatus;
 import model.Transaction.TransactionType;
+import model.dto.DepositWithdrawForm;
 import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 
-public class DashboardRepository {
-
-	public long countTotalCustomers() {
-		final String sql = "SELECT COUNT(*) FROM customers";
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			var rs = stmt.executeQuery();
-			if (rs.next()) {
-				return rs.getLong(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to fetch customer count");
-		}
-		return 0L;
-	}
-
-	public long countTotalAccounts() {
-		final String sql = "SELECT COUNT(*) FROM accounts";
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			var rs = stmt.executeQuery();
-			if (rs.next()) {
-				System.out.println(rs.getLong(1));
-				return rs.getLong(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to fetch account count");
-		}
-		return 0L;
-	}
-
-	public BigDecimal calculateTotalBalance() {
-		final String sql = "SELECT SUM(balance) FROM accounts";
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			var rs = stmt.executeQuery();
-			if (rs.next()) {
-				System.out.println(rs.getLong(1));
-				return rs.getBigDecimal(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to fetch Pending transactions count");
-		}
-		return new BigDecimal(23456.50);
-	}
+public class TransactionRepository {
 
 	public long countPendingTransactions() {
 		final String sql = "SELECT COUNT(*) FROM transactions where status = 'PENDING'";
@@ -67,7 +27,7 @@ public class DashboardRepository {
 		}
 		return 0L;
 	}
-
+	
 	public List<PendingTransaction> searchPendingTransactions() {
 		final String sql = """
 				SELECT
@@ -157,49 +117,7 @@ public class DashboardRepository {
 		}
 		return null;
 	}
-
-	public long countCustomersByStaffId(int staffId) {
-		final String sql = "SELECT COUNT(*) FROM customers where created_by = ?";
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			stmt.setInt(1, staffId);
-			var rs = stmt.executeQuery();
-			if (rs.next()) {
-				return rs.getLong(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to fetch customers count");
-		}
-		return 0;
-	}
-
-	public long countAccountsByStaffId(int staffId) {
-		final String sql = "SELECT COUNT(*) FROM accounts where created_by = ?";
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			stmt.setInt(1, staffId);
-			var rs = stmt.executeQuery();
-			if (rs.next()) {
-				return rs.getLong(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to fetch accounts count");
-		}
-		return 0;
-	}
-
-	public long countCardsByStaffId(int staffId) {
-		final String sql = "SELECT COUNT(*) FROM cards where issued_by = ?";
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			stmt.setInt(1, staffId);
-			var rs = stmt.executeQuery();
-			if (rs.next()) {
-				return rs.getLong(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Failed to fetch cards count");
-		}
-		return 0;
-	}
-
+	
 	public long countTodayTransactionsByStaffId(int staffId) {
 		final String sql = """
 				SELECT
@@ -225,5 +143,34 @@ public class DashboardRepository {
 			System.out.println("Failed to fetch today transactions count");
 		}
 		return 0;
+	}
+	
+	public DepositWithdrawForm getDepositWithdrawFormByAccountNumber(String accountNumber) {
+		final String sql = """
+				SELECT a.account_id, a.account_number, name, email, phone, address, c.created_at, balance
+				FROM accounts a
+				JOIN customer_accounts ca on a.account_id = ca.account_id
+				JOIN customers c on ca.customer_id = c.customer_id
+				WHERE a.account_number = ?
+				""";	
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setString(1, accountNumber);
+			var rs = stmt.executeQuery();
+			if(rs.next()) {
+				return new DepositWithdrawForm(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getString(6),
+						rs.getTimestamp(7).toLocalDateTime().toLocalDate(),
+						rs.getBigDecimal(8));
+			}
+			return null;
+		} catch (Exception e) {
+			System.out.println("Failed to fetch Recent transactions");
+		}
+		return null;
 	}
 }

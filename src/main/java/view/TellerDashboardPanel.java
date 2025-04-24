@@ -21,14 +21,8 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import controller.DashboardController;
-import model.Transaction.TransactionStatus;
-import model.dto.AdminDashboardStats;
-import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 import model.dto.TellerDashboardStats;
-import view.components.dashboard.TableActionCellEditor;
-import view.components.dashboard.TableActionCellRender;
-import view.components.dashboard.TableActionEvent;
 
 public class TellerDashboardPanel extends JPanel {
 

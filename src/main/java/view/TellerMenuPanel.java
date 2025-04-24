@@ -1,15 +1,25 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.function.Consumer;
 
-public class AdminMenuPanel extends JPanel {
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+
+public class TellerMenuPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JButton selectedButton; // Field to keep track of the selected button
 
-	public AdminMenuPanel(Consumer<String> navCallback) {
+	public TellerMenuPanel(Consumer<String> navCallback) {
 		setBackground(new Color(0x353535));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setPreferredSize(new Dimension(300, 700));
@@ -38,15 +48,12 @@ public class AdminMenuPanel extends JPanel {
 		add(Box.createVerticalStrut(50));
 
 		// Nav buttons
-		JButton dashboardBtn = addNavButton("Dashboard", navCallback);
-		addNavButton("User Management", navCallback);
+		addNavButton("Dashboard", navCallback);
 		addNavButton("Customer Management", navCallback);
 		addNavButton("Account Management", navCallback);
 		addNavButton("Card Management", navCallback);
 		addNavButton("Transactions", navCallback);
-		addNavButton("Interest Management", navCallback);
 		addNavButton("Transaction Logs", navCallback);
-		addNavButton("Account Status Control", navCallback);
 
 		// Push everything above up
 		add(Box.createVerticalGlue());
@@ -55,13 +62,9 @@ public class AdminMenuPanel extends JPanel {
 		addNavButton("Logout", action -> showLogoutConfirmation("Logout"));
 
 		add(Box.createVerticalStrut(20)); // bottom padding
-		
-		// Set the default selected button to "Dashboard"
-        selectedButton = dashboardBtn; // Assuming "Dashboard" is the first button added
-        selectedButton.setBackground(new Color(0x595959)); // Set to hover color
 	}
 
-	private JButton addNavButton(String name, Consumer<String> callback) {
+	private void addNavButton(String name, Consumer<String> callback) {
 		JButton button = new JButton(name);
 		button.setAlignmentX(Component.CENTER_ALIGNMENT);
 		button.setPreferredSize(new Dimension(300, 40)); // Set preferred size
@@ -81,27 +84,14 @@ public class AdminMenuPanel extends JPanel {
      // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-            	if(button != selectedButton) {
-                    button.setBackground(new Color(0x595959)); // Change background on hover
-            	}
+                button.setBackground(new Color(0x595959)); // Change background on hover
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-            	if(button != selectedButton) {
-                	button.setBackground(new Color(0x353535)); // Change background on hover exit
-            	}
+            	button.setBackground(new Color(0x353535)); // Change background on hover exit
             }
         });
-//		button.addActionListener(e -> callback.accept(name));
-        button.addActionListener(e -> {
-            if (selectedButton != null) {
-                selectedButton.setBackground(new Color(0x353535)); // Reset previous button
-            }
-            selectedButton = button; // Set the new selected button
-            selectedButton.setBackground(new Color(0x595959)); // Retain hover color
-            callback.accept(name);
-        });
+		button.addActionListener(e -> callback.accept(name));
 		add(button);
-		return button;
 	}
 	
 	private void showLogoutConfirmation(String action) {

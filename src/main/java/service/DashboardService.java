@@ -7,41 +7,50 @@ import model.dto.AdminDashboardStats;
 import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 import model.dto.TellerDashboardStats;
-import repository.DashboardRepository;
+import repository.AccountRepository;
+import repository.CardRepository;
+import repository.CustomerRepository;
+import repository.TransactionRepository;
 
 public class DashboardService {
 
-	private DashboardRepository repo;
+	private CustomerRepository customerRepo;
+	private AccountRepository accountRepo;
+	private TransactionRepository transactionRepo;
+	private CardRepository cardRepo;
 	
-	public DashboardService() {
-		repo = new DashboardRepository();
+	public DashboardService(CustomerRepository customerRepo, AccountRepository accountRepo, TransactionRepository transactionRepo, CardRepository cardRepo) {
+		this.customerRepo = customerRepo;
+		this.accountRepo = accountRepo;
+		this.transactionRepo = transactionRepo;
+		this.cardRepo = cardRepo;
 	}
 	
 	public AdminDashboardStats getAdminDashboardStats() {
 		return new AdminDashboardStats(
-				repo.countTotalCustomers(),
-				repo.countTotalAccounts(),
-				repo.calculateTotalBalance(),
-				repo.countPendingTransactions());
+				customerRepo.countTotalCustomers(),
+				accountRepo.countTotalAccounts(),
+				accountRepo.calculateTotalBalance(),
+				transactionRepo.countPendingTransactions());
 	}
 
 	public List<PendingTransaction> getPendingTransactions() {
-		return repo.searchPendingTransactions();
+		return transactionRepo.searchPendingTransactions();
 	}
 	
 	public int changeTransactionStatus(int trxId, TransactionStatus status) {
-		return repo.updateTransactionStatus(trxId, status);
+		return transactionRepo.updateTransactionStatus(trxId, status);
 	}
 	
 	public TellerDashboardStats getTellerDashboardStats(int staffId) {
 		return new TellerDashboardStats(
-				repo.countCustomersByStaffId(staffId),
-				repo.countAccountsByStaffId(staffId),
-				repo.countCardsByStaffId(staffId),
-				repo.countTodayTransactionsByStaffId(staffId));
+				customerRepo.countCustomersByStaffId(staffId),
+				accountRepo.countAccountsByStaffId(staffId),
+				cardRepo.countCardsByStaffId(staffId),
+				transactionRepo.countTodayTransactionsByStaffId(staffId));
 	}
 	
 	public List<RecentTransaction> getRecentTransactions(int staffId) {
-		return repo.searchLast24HrTransactionsByStaffId(staffId);
+		return transactionRepo.searchLast24HrTransactionsByStaffId(staffId);
 	}
 }
