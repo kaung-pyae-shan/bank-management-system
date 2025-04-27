@@ -4,30 +4,29 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import model.Transaction.TransactionStatus;
 import model.Transaction.TransactionType;
 
 public class RecentTransaction {
 
-	private int trxId;
+	private String referenceNumber;
 	private String customer;
 	private TransactionType transactionType;
 	private BigDecimal amount;
 	private LocalDateTime date;
-	private TransactionStatus status;
+	private int processedBy;
 
-	public RecentTransaction(int trxId, String customer, TransactionType transactionType, BigDecimal amount, LocalDateTime date, TransactionStatus status) {
+	public RecentTransaction(String referenceNumber, String customer, TransactionType transactionType, BigDecimal amount, LocalDateTime date, int processedBy) {
 		super();
-		this.trxId = trxId;
+		this.referenceNumber = referenceNumber;
 		this.customer = customer;
 		this.transactionType = transactionType;
 		this.amount = amount;
 		this.date = date;
-		this.status = status;
+		this.processedBy = processedBy;
 	}
 
-	public int getTrxId() {
-		return trxId;
+	public String getReferenceNumber() {
+		return referenceNumber;
 	}
 
 	public String getCustomer() {
@@ -46,12 +45,12 @@ public class RecentTransaction {
 		return date;
 	}
 	
-	public TransactionStatus getStatus() {
-		return status;
+	public int getProcessedBy() {
+		return processedBy;
 	}
 	
 	public Object[] toObject() {
-		Object[] obj = {this.trxId, this.customer, this.transactionType, this.amount.toString(), this.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), this.status};
+		Object[] obj = {this.referenceNumber, this.customer, this.transactionType, this.amount.toString(), this.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), this.processedBy};
 		return obj;
 	}
 

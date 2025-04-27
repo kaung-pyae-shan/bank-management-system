@@ -164,7 +164,7 @@ public class WithdrawPanel extends JPanel {
 						JOptionPane.showMessageDialog(null,  "Insufficient Balance!!", "Failed", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int row = controller.withdrawBalance(amount, currentAccountId);
+					int row = controller.withdrawBalance(amount, currentAccountId, 1);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Withdrawn successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(accNumberField.getText());

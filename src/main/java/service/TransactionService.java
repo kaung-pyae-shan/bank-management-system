@@ -5,12 +5,15 @@ import java.math.BigDecimal;
 import model.Transaction.TransactionType;
 import model.dto.DepositWithdrawForm;
 import repository.AccountRepository;
+import repository.TransactionRepository;
 
 public class TransactionService {
 
+	private TransactionRepository transactionRepo;
 	private AccountRepository accountRepo;
 
-	public TransactionService(AccountRepository accountRepo) {
+	public TransactionService(TransactionRepository transactionRepo, AccountRepository accountRepo) {
+		this.transactionRepo = transactionRepo;
 		this.accountRepo = accountRepo;
 	}
 
@@ -18,24 +21,24 @@ public class TransactionService {
 		return accountRepo.getDepositWithdrawFormByAccountNumber(accountNumber);
 	}
 
-	public int updateBalance(BigDecimal amount, TransactionType trxType, int fromAccountId, int toAccountid) {
+	public int updateBalance(BigDecimal amount, TransactionType trxType, int fromAccountId, int toAccountid, int processedBy) {
 		int row = 0;
 		switch (trxType) {
 		case DEPOSIT: {
 			row = accountRepo.updateBalanceByAccountId(amount, true, toAccountid);
+			transactionRepo.addDepositTransaction(toAccountid, trxType, amount, processedBy);
 			return row;
-			// transactions table logic here
 		}
 		case WITHDRAW: {
 			row = accountRepo.updateBalanceByAccountId(amount, false, fromAccountId);
+			transactionRepo.addWithdrawTransaction(fromAccountId, trxType, amount, processedBy);
 			return row;
-			// transactions table logic here
 		}
 		case TRANSFER: {
 			row += accountRepo.updateBalanceByAccountId(amount, true, toAccountid);
 			row += accountRepo.updateBalanceByAccountId(amount, false, fromAccountId);
+			transactionRepo.addTransferTransaction(fromAccountId, toAccountid, trxType, amount, processedBy);
 			return row;
-			// transactions table logic here
 		}
 		case INTEREST: {
 

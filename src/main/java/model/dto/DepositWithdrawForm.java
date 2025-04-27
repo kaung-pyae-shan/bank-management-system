@@ -3,9 +3,12 @@ package model.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import model.AccountType.Type;
+
 public class DepositWithdrawForm {
 
 	private int accountId;
+	private Type accountType;
 	private String accountNumber;
 	private String accountHolder;
 	private String email;
@@ -14,10 +17,11 @@ public class DepositWithdrawForm {
 	private LocalDate customerSince;
 	private BigDecimal currentBalance;
 
-	public DepositWithdrawForm(int accountId, String accountNumber, String accountHolder, String email, String phone,
+	public DepositWithdrawForm(int accountId, Type accountType, String accountNumber, String accountHolder, String email, String phone,
 			String address, LocalDate customerSince, BigDecimal currentBalance) {
 		super();
 		this.accountId = accountId;
+		this.accountType = accountType;
 		this.accountNumber = accountNumber;
 		this.accountHolder = accountHolder;
 		this.email = email;
@@ -29,6 +33,10 @@ public class DepositWithdrawForm {
 
 	public int getAccountId() {
 		return accountId;
+	}
+	
+	public Type getAccountType() {
+		return accountType;
 	}
 
 	public String getAccountNumber() {

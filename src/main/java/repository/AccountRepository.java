@@ -3,6 +3,7 @@ package repository;
 import java.math.BigDecimal;
 
 import config.DatabaseConfig;
+import model.AccountType.Type;
 import model.dto.DepositWithdrawForm;
 
 public class AccountRepository {
@@ -50,10 +51,11 @@ public class AccountRepository {
 	
 	public DepositWithdrawForm getDepositWithdrawFormByAccountNumber(String accountNumber) {
 		final String sql = """
-				SELECT a.account_id, a.account_number, name, email, phone, address, c.created_at, balance
+				SELECT a.account_id, at.account_type, a.account_number, name, email, phone, address, c.created_at, balance
 				FROM accounts a
 				JOIN customer_accounts ca on a.account_id = ca.account_id
 				JOIN customers c on ca.customer_id = c.customer_id
+				JOIN account_types at on a.account_type_id = at.account_type_id
 				WHERE a.account_number = ?
 				""";	
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
@@ -62,13 +64,14 @@ public class AccountRepository {
 			if(rs.next()) {
 				return new DepositWithdrawForm(
 						rs.getInt(1),
-						rs.getString(2),
+						Type.valueOf(rs.getString(2)),
 						rs.getString(3),
 						rs.getString(4),
 						rs.getString(5),
 						rs.getString(6),
-						rs.getTimestamp(7).toLocalDateTime().toLocalDate(),
-						rs.getBigDecimal(8));
+						rs.getString(7),
+						rs.getTimestamp(8).toLocalDateTime().toLocalDate(),
+						rs.getBigDecimal(9));
 			}
 			return null;
 		} catch (Exception e) {

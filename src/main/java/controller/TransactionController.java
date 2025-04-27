@@ -18,15 +18,15 @@ public class TransactionController {
 		return service.getDepositWithdrawForm(accountNumber);
 	}
 	
-	public int depositBalance(BigDecimal amount, int accountId) {
-		return service.updateBalance(amount, TransactionType.DEPOSIT, 0, accountId);
+	public int depositBalance(BigDecimal amount, int accountId, int processedBy) {
+		return service.updateBalance(amount, TransactionType.DEPOSIT, 0, accountId, processedBy);
 	}
 
-	public int withdrawBalance(BigDecimal amount, int accountId) {
-		return service.updateBalance(amount, TransactionType.WITHDRAW, accountId, 0);
+	public int withdrawBalance(BigDecimal amount, int accountId, int processedBy) {
+		return service.updateBalance(amount, TransactionType.WITHDRAW, accountId, 0, processedBy);
 	}
 	
-	public int transfer(int fromAccountId, int toAccountId, BigDecimal amount) {
-		return service.updateBalance(amount, TransactionType.TRANSFER, fromAccountId, toAccountId);
+	public int transfer(int fromAccountId, int toAccountId, BigDecimal amount, int processedBy) {
+		return service.updateBalance(amount, TransactionType.TRANSFER, fromAccountId, toAccountId, processedBy);
 	}
 }

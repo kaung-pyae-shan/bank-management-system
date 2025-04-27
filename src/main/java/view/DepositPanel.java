@@ -160,7 +160,7 @@ public class DepositPanel extends JPanel {
 				BigDecimal amount = new BigDecimal(0);
 				try {
 					amount = new BigDecimal(amountField.getText());
-					int row = controller.depositBalance(amount, currentAccountId);
+					int row = controller.depositBalance(amount, currentAccountId, 1);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Deposited successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(accNumberField.getText());
@@ -172,7 +172,6 @@ public class DepositPanel extends JPanel {
 				} catch (NumberFormatException e2) {
 					JOptionPane.showMessageDialog(null, "Enter valid input", "Error", JOptionPane.ERROR_MESSAGE);
 				}
-				System.out.println(amount.toString());
 			}
 		});
 	}

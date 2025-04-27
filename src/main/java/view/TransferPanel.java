@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import controller.TransactionController;
+import model.AccountType.Type;
 import model.dto.DepositWithdrawForm;
 
 public class TransferPanel extends JPanel {
@@ -105,7 +106,7 @@ public class TransferPanel extends JPanel {
 		
 		JButton actionButton = new JButton("Transfer");
 		actionButton.setForeground(Color.white);
-		actionButton.setBackground(new Color(0xe0162b));
+		actionButton.setBackground(new Color(0x326e9d));
 		actionButton.setFocusPainted(false);
 		actionButton.setPreferredSize(new Dimension(100, 30));
 		gbc.gridx = 1;
@@ -131,9 +132,19 @@ public class TransferPanel extends JPanel {
 					currentBalanceField.setText(form.getCurrentBalance().toString());
 					fromAccountId = form.getAccountId();
 				} else {
-					toAccHolderField.setText("");
+					fromAccHolderField.setText("");
 					currentBalanceField.setText("");
 					fromAccountId = 0;
+					JOptionPane.showMessageDialog(null,  "There is no account with account number: " + accountNumber, "Failed", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if(form.getAccountType() == Type.FIXED) {
+
+					fromAccHolderField.setText("");
+					currentBalanceField.setText("");
+					fromAccountId = 0;
+					JOptionPane.showMessageDialog(null,  "You cannot transfer funds from Fixed Deposit account!!", "Failed", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}
 		});
@@ -150,6 +161,15 @@ public class TransferPanel extends JPanel {
 					toAccHolderField.setText("");
 					currentBalanceField.setText("");
 					toAccountId = 0;
+					JOptionPane.showMessageDialog(null,  "There is no account with account number: " + accountNumber, "Failed", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if(form.getAccountType() == Type.FIXED) {
+					toAccHolderField.setText("");
+					currentBalanceField.setText("");
+					toAccountId = 0;
+					JOptionPane.showMessageDialog(null,  "You cannot transfer funds to Fixed Deposit account!!", "Failed", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 			}
 		});
@@ -164,7 +184,7 @@ public class TransferPanel extends JPanel {
 						JOptionPane.showMessageDialog(null,  "Insufficient Balance!!", "Failed", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int row = controller.transfer(fromAccountId, toAccountId, amount);
+					int row = controller.transfer(fromAccountId, toAccountId, amount, 1);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Transferred successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(fromAccNumberField.getText());

@@ -7,14 +7,14 @@ public class AdminDashboardStats {
 	private long customers;
 	private long accounts;
 	private BigDecimal bankBalance;
-	private long pendingTransactions;
+	private long transactionTodays;
 
-	public AdminDashboardStats(long customers, long accounts, BigDecimal bankBalance, long pendingTransactions) {
+	public AdminDashboardStats(long customers, long accounts, BigDecimal bankBalance, long transactionTodays) {
 		super();
 		this.customers = customers;
 		this.accounts = accounts;
 		this.bankBalance = bankBalance;
-		this.pendingTransactions = pendingTransactions;
+		this.transactionTodays = transactionTodays;
 	}
 
 	public long getCustomers() {
@@ -29,8 +29,8 @@ public class AdminDashboardStats {
 		return bankBalance;
 	}
 
-	public long getPendingTransactions() {
-		return pendingTransactions;
+	public long getTransactionTodays() {
+		return transactionTodays;
 	}
 
 }

@@ -31,7 +31,7 @@ public class DashboardService {
 				customerRepo.countTotalCustomers(),
 				accountRepo.countTotalAccounts(),
 				accountRepo.calculateTotalBalance(),
-				transactionRepo.countPendingTransactions());
+				transactionRepo.countTodayTransactions());
 	}
 
 	public List<PendingTransaction> getPendingTransactions() {
@@ -48,6 +48,10 @@ public class DashboardService {
 				accountRepo.countAccountsByStaffId(staffId),
 				cardRepo.countCardsByStaffId(staffId),
 				transactionRepo.countTodayTransactionsByStaffId(staffId));
+	}
+	
+	public List<RecentTransaction> getRecentTransactions() {
+		return transactionRepo.searchLast24HrTransactions();
 	}
 	
 	public List<RecentTransaction> getRecentTransactions(int staffId) {

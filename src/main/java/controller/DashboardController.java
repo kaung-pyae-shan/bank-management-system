@@ -31,11 +31,13 @@ public class DashboardController {
 	
 	public TellerDashboardStats fetchTellerDashboardStats(int staffId) {
 		return service.getTellerDashboardStats(staffId);
-//		return new TellerDashboardStats(0, 0, 0, 0);
+	}
+	
+	public List<RecentTransaction> fetchTellerDashboardTable() {
+		return service.getRecentTransactions();
 	}
 	
 	public List<RecentTransaction> fetchTellerDashboardTable(int staffId) {
-//		return List.of(new RecentTransaction(9, "John", TransactionType.DEPOSIT, new BigDecimal(100000.00), LocalDateTime.now(), TransactionStatus.APPROVED));
 		return service.getRecentTransactions(staffId);
 	}
 }
