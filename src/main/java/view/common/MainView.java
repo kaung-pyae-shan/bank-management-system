@@ -13,11 +13,11 @@ import config.DependenciesConfig;
 import utils.UpdateablePanel;
 import view.AccountManagementPanel;
 import view.AccountStatusControlPanel;
+import view.AdminDashboardPanel;
 import view.AdminMenuPanel;
 import view.CardManagementPanel;
 import view.CustomerManagementPanel;
 import view.InterestManagementPanel;
-import view.TellerDashboardPanel;
 import view.TransactionLogsPanel;
 import view.TransactionsPanel;
 import view.UserManagementPanel;
@@ -54,8 +54,8 @@ public class MainView extends JFrame {
 
 		// 🔹 Add views to the CardLayout
 		// ------------------- Add login logic here -----------------------
-//		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
-		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController()), "Dashboard");
+		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
+//		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController()), "Dashboard");
 		mainContentPanel.add(new UserManagementPanel(), "User Management");
 		mainContentPanel.add(new CustomerManagementPanel(), "Customer Management");
 		mainContentPanel.add(new AccountManagementPanel(), "Account Management");

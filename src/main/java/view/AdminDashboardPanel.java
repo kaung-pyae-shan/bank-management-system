@@ -67,7 +67,7 @@ public class AdminDashboardPanel extends JPanel implements UpdateablePanel {
 		AdminDashboardStats stats = controller.fetchAdminDashboardStats();
 		customerValueLabel.setText(String.valueOf(stats.getCustomers()));
 		accountValueLabel.setText(String.valueOf(stats.getAccounts()));
-		balanceValueLabel.setText(stats.getBankBalance().toString());
+		balanceValueLabel.setText(stats.getBankBalance() == null ? "0" : stats.getBankBalance().toString());
 		pendingValueLabel.setText(String.valueOf(stats.getTransactionTodays()));
 
 		// Styling Stats Box Panels
@@ -242,7 +242,7 @@ public class AdminDashboardPanel extends JPanel implements UpdateablePanel {
 	    AdminDashboardStats stats = controller.fetchAdminDashboardStats();
 	    customerValueLabel.setText(String.valueOf(stats.getCustomers()));
 	    accountValueLabel.setText(String.valueOf(stats.getAccounts()));
-	    balanceValueLabel.setText(stats.getBankBalance().toString());
+	    balanceValueLabel.setText(stats.getBankBalance() == null ? "0" : stats.getBankBalance().toString());
 	    pendingValueLabel.setText(String.valueOf(stats.getTransactionTodays()));
 
 	    // Create a new table
