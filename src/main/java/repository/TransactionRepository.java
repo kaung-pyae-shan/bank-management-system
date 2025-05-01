@@ -8,7 +8,6 @@ import java.util.List;
 import config.DatabaseConfig;
 import model.Transaction.TransactionStatus;
 import model.Transaction.TransactionType;
-import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 import utils.ReferenceNumberGenerator;
 
@@ -32,44 +31,7 @@ public class TransactionRepository {
 			System.out.println("Failed to fetch Pending transactions count");
 		}
 		return 0L;
-	}
-	
-	public List<PendingTransaction> searchPendingTransactions() {
-		final String sql = """
-				SELECT
-				    t.transaction_id,
-				    c.name AS customer_name,
-				    t.transaction_type,
-				    t.amount,
-				    t.transaction_date
-				FROM
-				    transactions t
-				JOIN
-				    accounts a ON t.from_account_id = a.account_id OR t.to_account_id = a.account_id
-				JOIN
-				    customer_accounts ca ON a.account_id = ca.account_id
-				JOIN
-				    customers c ON ca.customer_id = c.customer_id
-				WHERE
-				    t.status = 'PENDING';
-								""";
-		List<PendingTransaction> pendings = new ArrayList<>();
-		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
-			var rs = stmt.executeQuery();
-			while(rs.next()) {
-				int trxId = rs.getInt(1);
-				String cusName = rs.getString(2);
-				TransactionType trxType = TransactionType.valueOf(rs.getString(3));
-				BigDecimal amount = rs.getBigDecimal(4);
-				LocalDateTime trxTime = rs.getTimestamp(5).toLocalDateTime();
-				pendings.add(new PendingTransaction(trxId, cusName, trxType, amount, trxTime));
-			}
-			return pendings;
-		} catch (Exception e) {
-			System.out.println("Failed to fetch Pending transactions");
-		}
-		return null;
-	}
+	}	
 	
 	public int updateTransactionStatus(int trxId, TransactionStatus status) {
 		final String sql = "UPDATE transactions SET status = ? WHERE transaction_id = ?";

@@ -21,14 +21,9 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import controller.DashboardController;
-import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
-import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 import utils.UpdateablePanel;
-import view.components.dashboard.TableActionCellEditor;
-import view.components.dashboard.TableActionCellRender;
-import view.components.dashboard.TableActionEvent;
 
 public class AdminDashboardPanel extends JPanel implements UpdateablePanel {
 
@@ -90,77 +85,13 @@ public class AdminDashboardPanel extends JPanel implements UpdateablePanel {
 		statsPanel.add(pendingStatsPanel);
 
 		/*
-		 * ========================== Section: Pending Transactions
+		 * ========================== Section: Recent Transactions
 		 * ==========================
 		 */
 		// Pending Transactions Label
 		JLabel pendingLabel = new JLabel("Recent Transactions");
 		pendingLabel.setFont(new Font("Arial", Font.BOLD, 14));
 		pendingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-//		// Fetch the data from the controller
-//		List<PendingTransaction> transactions = controller.fetchAdminDashboardTable();
-//
-//		// Define the column names
-//		String[] columns = { "Trx Id", "Customer", "Type", "Amount", "Date", "Action" };
-//
-//		// Create the DefaultTableModel without specifying the number of rows
-//		DefaultTableModel model = new DefaultTableModel(columns, 0) {
-//			private static final long serialVersionUID = 1L;
-//			@Override
-//			public boolean isCellEditable(int row, int column) {
-//				// Allow editing only for the last column (Action column)
-//				return column == columns.length - 1;
-//			}
-//		};
-//
-//		// Add rows to the model
-//		for (PendingTransaction trx : transactions) {
-//			model.addRow(trx.toObject());
-//		}
-//
-//		// Create the JTable with the model
-//		JTable table = new JTable(model);
-//		table.getTableHeader().setReorderingAllowed(false); // Disable column reordering
-//		table.setRowHeight(40);
-//
-//		TableActionEvent event = new TableActionEvent() {
-//			@Override
-//			public void onApprove(int row) {
-//				if (table.isEditing()) {
-//					table.getCellEditor().stopCellEditing();
-//				}
-//				
-//				DefaultTableModel model = (DefaultTableModel) table.getModel();
-//				Object trxIdObj = model.getValueAt(row, 0); // get trxID from table
-//				int trxId = Integer.parseInt(trxIdObj.toString());
-//				controller.updateTransactionStatus(trxId, TransactionStatus.APPROVED);
-//				pendingValueLabel.setText(
-//						String.valueOf(controller.fetchAdminDashboardStats().getPendingTransactions()
-//						)); // Update the Pending Stats value
-//				model.removeRow(row);
-//			}
-//
-//			@Override
-//			public void onReject(int row) {
-//				if (table.isEditing()) {
-//					table.getCellEditor().stopCellEditing();
-//				}
-//				DefaultTableModel model = (DefaultTableModel) table.getModel();
-//				Object trxIdObj = model.getValueAt(row, 0); // get trxId from table
-//				int trxId = Integer.parseInt(trxIdObj.toString());
-//				controller.updateTransactionStatus(trxId, TransactionStatus.REJECTED);
-//				pendingValueLabel.setText(
-//						String.valueOf(controller.fetchAdminDashboardStats().getPendingTransactions()
-//						)); // Update the Pending Stats value
-//				model.removeRow(row);
-//			}
-//		};
-//		table.getColumnModel().getColumn(5).setCellRenderer(new TableActionCellRender());
-//		table.getColumnModel().getColumn(5).setCellEditor(new TableActionCellEditor(event));
-//
-//		// Create a JScrollPane and add the table to it
-//		JScrollPane tableScroll = new JScrollPane(table);
 
 		table = generateTable();
 
@@ -187,7 +118,7 @@ public class AdminDashboardPanel extends JPanel implements UpdateablePanel {
 		// Fetch the data from the controller
 		// --------------------------------------- Add Login Staff Id
 		// ----------------------------
-		List<RecentTransaction> transactions = controller.fetchTellerDashboardTable();
+		List<RecentTransaction> transactions = controller.fetchAdminDashboardTable();
 		// --------------------------------------- Add Login Staff Id
 		// ----------------------------
 

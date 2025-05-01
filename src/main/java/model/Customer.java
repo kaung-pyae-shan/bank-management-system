@@ -8,11 +8,29 @@ public class Customer {
 	private int id;
 	private String name;
 	private LocalDate dob;
+	private String nrc;
 	private String email;
 	private String phone;
 	private String address;
 	private LocalDateTime createdAt;
 	private Staff staff;
+	
+	public Customer() {
+	}
+
+	public Customer(int id, String name, LocalDate dob, String nrc, String email, String phone, String address,
+			LocalDateTime createdAt, Staff staff) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.dob = dob;
+		this.nrc = nrc;
+		this.email = email;
+		this.phone = phone;
+		this.address = address;
+		this.createdAt = createdAt;
+		this.staff = staff;
+	}
 
 	public int getId() {
 		return id;
@@ -36,6 +54,14 @@ public class Customer {
 
 	public void setDob(LocalDate dob) {
 		this.dob = dob;
+	}
+	
+	public String getNrc() {
+		return nrc;
+	}
+	
+	public void setNrc(String nrc) {
+		this.nrc = nrc;
 	}
 
 	public String getEmail() {
@@ -76,5 +102,10 @@ public class Customer {
 
 	public void setStaff(Staff staff) {
 		this.staff = staff;
+	}
+
+	public Object[] toObject() {
+		Object[] obj = {this.name, this.dob, this.nrc, this.email, this.phone, this.address, this.createdAt, this.staff, this.id};
+		return obj;
 	}
 }
