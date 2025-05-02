@@ -29,7 +29,7 @@ public class MainView extends JFrame {
 	private JPanel mainContentPanel;
 	private CardLayout cardLayout;
 
-	public MainView(DependenciesConfig config) {
+	public MainView(DependenciesConfig config, int loggedInStaffId) {
 		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,12 +55,12 @@ public class MainView extends JFrame {
 		// 🔹 Add views to the CardLayout
 		// ------------------- Add login logic here -----------------------
 		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
-//		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController()), "Dashboard");
+//		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController(), loggedInStaffId), "Dashboard");
 		mainContentPanel.add(new UserManagementPanel(), "User Management");
-		mainContentPanel.add(new CustomerManagementPanel(config.getCustomerController()), "Customer Management");
+		mainContentPanel.add(new CustomerManagementPanel(config.getCustomerController(), loggedInStaffId), "Customer Management");
 		mainContentPanel.add(new AccountManagementPanel(), "Account Management");
 		mainContentPanel.add(new CardManagementPanel(), "Card Management");
-		mainContentPanel.add(new TransactionsPanel(config.getTransactionController()), "Transactions");
+		mainContentPanel.add(new TransactionsPanel(config.getTransactionController(), loggedInStaffId), "Transactions");
 		mainContentPanel.add(new InterestManagementPanel(), "Interest Management");
 		mainContentPanel.add(new TransactionLogsPanel(), "Transaction Logs");
 		mainContentPanel.add(new AccountStatusControlPanel(), "Account Status Control");

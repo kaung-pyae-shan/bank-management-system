@@ -13,13 +13,13 @@ public class Customer {
 	private String phone;
 	private String address;
 	private LocalDateTime createdAt;
-	private Staff staff;
+	private int staffId;
 	
 	public Customer() {
 	}
 
 	public Customer(int id, String name, LocalDate dob, String nrc, String email, String phone, String address,
-			LocalDateTime createdAt, Staff staff) {
+			LocalDateTime createdAt, int staffId) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -29,7 +29,7 @@ public class Customer {
 		this.phone = phone;
 		this.address = address;
 		this.createdAt = createdAt;
-		this.staff = staff;
+		this.staffId = staffId;
 	}
 
 	public int getId() {
@@ -96,16 +96,16 @@ public class Customer {
 		this.createdAt = createdAt;
 	}
 
-	public Staff getStaff() {
-		return staff;
+	public int getStaffId() {
+		return staffId;
 	}
 
-	public void setStaff(Staff staff) {
-		this.staff = staff;
+	public void setStaffId(int staffId) {
+		this.staffId = staffId;
 	}
 
 	public Object[] toObject() {
-		Object[] obj = {this.name, this.dob, this.nrc, this.email, this.phone, this.address, this.createdAt, this.staff, this.id};
+		Object[] obj = {this.name, this.dob, this.nrc, this.email, this.phone, this.address, this.createdAt, this.staffId, this.id};
 		return obj;
 	}
 }

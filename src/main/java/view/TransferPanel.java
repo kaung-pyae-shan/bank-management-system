@@ -38,7 +38,7 @@ public class TransferPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public TransferPanel(TransactionController controller) {
+	public TransferPanel(TransactionController controller, int loggedInStaffId) {
 		// ==== Form Panel ====
 		setLayout(new GridBagLayout());
 
@@ -184,7 +184,7 @@ public class TransferPanel extends JPanel {
 						JOptionPane.showMessageDialog(null,  "Insufficient Balance!!", "Failed", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int row = controller.transfer(fromAccountId, toAccountId, amount, 1);
+					int row = controller.transfer(fromAccountId, toAccountId, amount, loggedInStaffId);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Transferred successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(fromAccNumberField.getText());

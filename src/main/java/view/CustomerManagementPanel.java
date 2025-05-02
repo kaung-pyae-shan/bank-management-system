@@ -83,7 +83,7 @@ public class CustomerManagementPanel extends JPanel {
 	 * {Labels} tableScrollPane -> {JTable}
 	 */
 
-	public CustomerManagementPanel(CustomerController controller) {
+	public CustomerManagementPanel(CustomerController controller, int loggedInStaffId) {
 		this.controller = controller;
 		setLayout(new BorderLayout(0, 5));
 
@@ -318,6 +318,7 @@ public class CustomerManagementPanel extends JPanel {
 			customer.setEmail(emailField.getText());
 			customer.setPhone(phoneField.getText());
 			customer.setAddress(addressField.getText());
+			customer.setStaffId(loggedInStaffId);
 
 			int row = controller.addNewCustomer(customer);
 			if(row == 1) {
@@ -339,6 +340,7 @@ public class CustomerManagementPanel extends JPanel {
 			customer.setEmail(emailField.getText());
 			customer.setPhone(phoneField.getText());
 			customer.setAddress(addressField.getText());
+			customer.setStaffId(loggedInStaffId);
 
 			int row = controller.editCustomerById(customer);
 			if(row == 1) {

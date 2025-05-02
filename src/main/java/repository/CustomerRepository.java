@@ -55,8 +55,9 @@ public class CustomerRepository {
 				String phone = rs.getString("phone");
 				String address = rs.getString("address");
 				LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
+				int createdBy = rs.getInt("created_by");
 				
-				Customer customer = new Customer(customerId, name, dob, nrc, email, phone, address, createdAt, null);
+				Customer customer = new Customer(customerId, name, dob, nrc, email, phone, address, createdAt, createdBy);
 				customers.add(customer);
 			}
 			return customers;
@@ -121,7 +122,7 @@ public class CustomerRepository {
 			stmt.setString(4, customer.getEmail());
 			stmt.setString(5, customer.getPhone());
 			stmt.setString(6, customer.getAddress());
-			stmt.setInt(7, 3);
+			stmt.setInt(7, customer.getStaffId());
 			int row = stmt.executeUpdate();
 			return row;
 		} catch (Exception e) {
@@ -164,6 +165,7 @@ public class CustomerRepository {
 				customer.setPhone(rs.getString("phone"));
 				customer.setAddress(rs.getString("address"));
 				customer.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+				customer.setStaffId(rs.getInt("created_by"));
 				return customer;
 			}
 		} catch (Exception e) {

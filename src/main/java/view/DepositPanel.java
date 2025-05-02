@@ -39,7 +39,7 @@ public class DepositPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public DepositPanel(TransactionController controller) {
+	public DepositPanel(TransactionController controller, int loggedInStaffId) {
 		// ==== Form Panel ====
 		setLayout(new GridBagLayout());
 
@@ -160,7 +160,7 @@ public class DepositPanel extends JPanel {
 				BigDecimal amount = new BigDecimal(0);
 				try {
 					amount = new BigDecimal(amountField.getText());
-					int row = controller.depositBalance(amount, currentAccountId, 1);
+					int row = controller.depositBalance(amount, currentAccountId, loggedInStaffId);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Deposited successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(accNumberField.getText());

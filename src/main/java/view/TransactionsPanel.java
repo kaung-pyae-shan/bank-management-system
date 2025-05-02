@@ -26,7 +26,7 @@ public class TransactionsPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public TransactionsPanel(TransactionController controller) {
+	public TransactionsPanel(TransactionController controller, int loggedInStaffId) {
 		setLayout(new BorderLayout(0, 0));
 
 		// ========= Tabs Section =========
@@ -67,9 +67,9 @@ public class TransactionsPanel extends JPanel {
 		mainFormPanel = new JPanel(cardLayout);
 		add(mainFormPanel, BorderLayout.CENTER);
 		
-		mainFormPanel.add(new DepositPanel(controller), "Deposit");
-		mainFormPanel.add(new WithdrawPanel(controller), "Withdraw");
-		mainFormPanel.add(new TransferPanel(controller), "Transfer");
+		mainFormPanel.add(new DepositPanel(controller, loggedInStaffId), "Deposit");
+		mainFormPanel.add(new WithdrawPanel(controller, loggedInStaffId), "Withdraw");
+		mainFormPanel.add(new TransferPanel(controller, loggedInStaffId), "Transfer");
 		showPanel("Deposit");
 	}
 

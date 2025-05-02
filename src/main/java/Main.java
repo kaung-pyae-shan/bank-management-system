@@ -7,7 +7,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
-			MainView view = new MainView(new DependenciesConfig());
+			MainView view = new MainView(new DependenciesConfig(), 1);
 			view.setVisible(true);
 		});
 	}
