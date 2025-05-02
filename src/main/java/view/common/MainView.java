@@ -57,7 +57,7 @@ public class MainView extends JFrame {
 		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
 //		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController()), "Dashboard");
 		mainContentPanel.add(new UserManagementPanel(), "User Management");
-		mainContentPanel.add(new CustomerManagementPanel(), "Customer Management");
+		mainContentPanel.add(new CustomerManagementPanel(config.getCustomerController()), "Customer Management");
 		mainContentPanel.add(new AccountManagementPanel(), "Account Management");
 		mainContentPanel.add(new CardManagementPanel(), "Card Management");
 		mainContentPanel.add(new TransactionsPanel(config.getTransactionController()), "Transactions");

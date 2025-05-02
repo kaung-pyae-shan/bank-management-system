@@ -4,7 +4,6 @@ import java.util.List;
 
 import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
-import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 import model.dto.TellerDashboardStats;
 import service.DashboardService;
@@ -21,9 +20,9 @@ public class DashboardController {
 		return service.getAdminDashboardStats();
 	}
 	
-	public List<PendingTransaction> fetchAdminDashboardTable() {
-		return service.getPendingTransactions();
-	}
+//	public List<PendingTransaction> fetchAdminDashboardTable() {
+//		return service.getPendingTransactions();
+//	}
 	
 	public int updateTransactionStatus(int trxId, TransactionStatus status) {
 		return service.changeTransactionStatus(trxId, status);
@@ -33,7 +32,7 @@ public class DashboardController {
 		return service.getTellerDashboardStats(staffId);
 	}
 	
-	public List<RecentTransaction> fetchTellerDashboardTable() {
+	public List<RecentTransaction> fetchAdminDashboardTable() {
 		return service.getRecentTransactions();
 	}
 	

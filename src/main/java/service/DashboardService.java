@@ -4,7 +4,6 @@ import java.util.List;
 
 import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
-import model.dto.PendingTransaction;
 import model.dto.RecentTransaction;
 import model.dto.TellerDashboardStats;
 import repository.AccountRepository;
@@ -32,10 +31,6 @@ public class DashboardService {
 				accountRepo.countTotalAccounts(),
 				accountRepo.calculateTotalBalance(),
 				transactionRepo.countTodayTransactions());
-	}
-
-	public List<PendingTransaction> getPendingTransactions() {
-		return transactionRepo.searchPendingTransactions();
 	}
 	
 	public int changeTransactionStatus(int trxId, TransactionStatus status) {
