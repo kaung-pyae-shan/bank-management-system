@@ -10,7 +10,7 @@ public class AccountType {
 	private BigDecimal minimumBalance;
 	
 	public enum Type {
-		SAVING, FIXED
+		SAVING, FIXED_90D, FIXED_180D, FIXED_360D, FIXED_720D, FIXED_1080D
 	}
 	
 	public enum OwnershipType {

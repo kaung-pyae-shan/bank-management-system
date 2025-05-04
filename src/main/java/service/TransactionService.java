@@ -28,17 +28,29 @@ public class TransactionService {
 		int row = 0;
 		switch (trxType) {
 		case DEPOSIT: {
+			if(transactionRepo.getThisMonthTransactionCountByAccountId(toAccountid) == 0) {
+				accountRepo.setPreviousMonthBalance(toAccountid);
+			}
 			row = accountRepo.updateBalanceByAccountId(amount, true, toAccountid);
 			transactionRepo.addDepositTransaction(toAccountid, trxType, amount, processedBy);
 			return row;
 		}
 		case WITHDRAW: {
+			if(transactionRepo.getThisMonthTransactionCountByAccountId(fromAccountId) == 0) {
+				accountRepo.setPreviousMonthBalance(fromAccountId);
+			}
 			row = accountRepo.updateBalanceByAccountId(amount, false, fromAccountId);
 			transactionRepo.addWithdrawTransaction(fromAccountId, trxType, amount, processedBy);
 			return row;
 		}
 		case TRANSFER: {
+			if(transactionRepo.getThisMonthTransactionCountByAccountId(toAccountid) == 0) {
+				accountRepo.setPreviousMonthBalance(toAccountid);
+			}
 			row += accountRepo.updateBalanceByAccountId(amount, true, toAccountid);
+			if(transactionRepo.getThisMonthTransactionCountByAccountId(fromAccountId) == 0) {
+				accountRepo.setPreviousMonthBalance(fromAccountId);
+			}
 			row += accountRepo.updateBalanceByAccountId(amount, false, fromAccountId);
 			transactionRepo.addTransferTransaction(fromAccountId, toAccountid, trxType, amount, processedBy);
 			return row;

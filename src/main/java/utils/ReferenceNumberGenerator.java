@@ -26,8 +26,6 @@ public class ReferenceNumberGenerator {
 
 			// Check if the last record date is in the past
 			if (formattedLastDate.compareTo(formattedCurrentDate) < 0) {
-				System.out.println("Current date: " + currentDate.toString());
-				System.out.println("Last date: " + lastDate.toString());
 				newNumber = 1; // Start from 1 if the last date is in the past
 			} else {
 				newNumber = Integer.parseInt(parts[2]) + 1; // Increment the last number
@@ -42,7 +40,7 @@ public class ReferenceNumberGenerator {
 	}
 
 	private String getLastReferenceNumber() {
-		String query = "SELECT reference_number FROM transactions ORDER BY transaction_date DESC LIMIT 1";
+		String query = "SELECT reference_number FROM transactions WHERE transaction_date <= NOW() ORDER BY transaction_date DESC LIMIT 1";
 		try (var con = DatabaseConfig.getConnection();
 				var stmt = con.prepareStatement(query);
 				ResultSet rs = stmt.executeQuery()) {

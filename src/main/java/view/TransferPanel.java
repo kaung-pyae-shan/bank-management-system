@@ -130,7 +130,7 @@ public class TransferPanel extends JPanel {
 					JOptionPane.showMessageDialog(null,  "There is no account with account number: " + accountNumber, "Failed", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if(form.getAccountType() == Type.FIXED) {
+				if(form.getAccountType() != Type.SAVING) {
 
 					fromAccHolderField.setText("");
 					currentBalanceField.setText("");
@@ -156,7 +156,7 @@ public class TransferPanel extends JPanel {
 					JOptionPane.showMessageDialog(null,  "There is no account with account number: " + accountNumber, "Failed", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if(form.getAccountType() == Type.FIXED) {
+				if(form.getAccountType() != Type.SAVING) {
 					toAccHolderField.setText("");
 					currentBalanceField.setText("");
 					toAccountId = 0;
@@ -188,7 +188,6 @@ public class TransferPanel extends JPanel {
 				} catch (NumberFormatException e2) {
 					JOptionPane.showMessageDialog(null, "Enter valid input", "Error", JOptionPane.ERROR_MESSAGE);
 				}
-				System.out.println(amount.toString());
 			}
 		});
 	}

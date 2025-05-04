@@ -2,6 +2,7 @@ package repository;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -329,5 +330,73 @@ public class TransactionRepository {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public BigDecimal getDepositsDay1To5(int accountId, LocalDateTime from, LocalDateTime to) {
+	    String sql = """
+	        SELECT COALESCE(SUM(amount), 0) AS D1_5Deposit
+	        FROM transactions
+	        WHERE transaction_type = 'DEPOSIT' AND to_account_id = ? 
+	        AND transaction_date BETWEEN ? AND ?
+	    """;
+	    
+	    try(var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, accountId);
+			stmt.setTimestamp(2, Timestamp.valueOf(from));
+			stmt.setTimestamp(3, Timestamp.valueOf(to));
+			var rs = stmt.executeQuery();
+			if (rs.next()) {
+				var result = rs.getBigDecimal("D1_5Deposit");
+				return result == null ? new BigDecimal(0) : result;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return new BigDecimal(0.00);
+	}
+	
+	public BigDecimal getThisMonthWithdrawAmountByAccountId(int accountId) {
+		String sql = """
+				SELECT 
+					SUM(t.amount) AS total_withdraw_this_month
+				FROM 
+					transactions t
+				WHERE 
+					t.transaction_type = 'WITHDRAW'
+					AND t.from_account_id = ?
+					AND MONTH(t.transaction_date) = MONTH(CURRENT_DATE())
+					AND YEAR(t.transaction_date) = YEAR(CURRENT_DATE());
+				""";
+		try(var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, accountId);
+			var rs = stmt.executeQuery();
+			if (rs.next()) {
+				var result = rs.getBigDecimal("total_withdraw_this_month");
+				return result == null ? new BigDecimal(0) : result;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return new BigDecimal(0.00);
+	}
+	
+	public long getThisMonthTransactionCountByAccountId(int accountId) {
+		String sql = """
+				SELECT COUNT(*) AS count 
+				FROM transactions
+				WHERE to_account_id = ?
+				AND MONTH(transaction_date) = MONTH(CURRENT_DATE())
+				AND YEAR(transaction_date) = YEAR(CURRENT_DATE());
+				""";
+		try(var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, accountId);
+			var rs = stmt.executeQuery();
+			if(rs.next()) {
+				return rs.getLong("count");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }

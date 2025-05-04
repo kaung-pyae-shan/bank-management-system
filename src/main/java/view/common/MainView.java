@@ -70,7 +70,7 @@ public class MainView extends JFrame {
 		mainContentPanel.add(new AccountManagementPanel(), "Account Management");
 		mainContentPanel.add(new CardManagement(), "Card Management");
 		mainContentPanel.add(new TransactionsPanel(config.getTransactionController(), loggedInStaffId), "Transactions");
-		mainContentPanel.add(new InterestManagementPanel(), "Interest Management");
+		mainContentPanel.add(new InterestManagementPanel(config.getInterestController(), loggedInStaffId), "Interest Management");
 		mainContentPanel.add(new TransactionLogsPanel(config.getTransactionController(), loggedInStaffId, role), "Transaction Logs");
 		// Add more panels later: e.g. mainContentPanel.add(new CustomerPanel(), "Customers");
 
