@@ -56,24 +56,24 @@ public class UserManagement extends JPanel {
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		searchBarPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		txtSearch = new JTextField(20);
-		txtSearch.setText("Search by NRC");
+		txtSearch.setText("Search by Name");
 		searchBarPanel.add(txtSearch);
 
 		txtSearch.addFocusListener(new FocusAdapter() {
-			public void focusGained(FocusEvent e) {
-				if (txtSearch.getText().equals("Search")) {
-					txtSearch.setText("");
-					txtSearch.setForeground(Color.BLACK);
-				}
-			}
+		    public void focusGained(FocusEvent e) {
+		        if (txtSearch.getText().equals("Search by Name")) {
+		            txtSearch.setText("");
+		            txtSearch.setForeground(Color.BLACK);
+		        }
+		    }
 
-			public void focusLost(FocusEvent e) {
-				if (txtSearch.getText().isEmpty()) {
-					txtSearch.setForeground(Color.GRAY);
-					txtSearch.setText("Search");
-					loadStaffData();
-				}
-			}
+		    public void focusLost(FocusEvent e) {
+		        if (txtSearch.getText().isEmpty()) {
+		            txtSearch.setForeground(Color.GRAY);
+		            txtSearch.setText("Search by Name");
+		            loadStaffData();
+		        }
+		    }
 		});
 
 		txtSearch.getDocument().addDocumentListener(new DocumentListener() {
@@ -89,6 +89,7 @@ public class UserManagement extends JPanel {
 				searchStaff();
 			}
 		});
+		
 
 		// ==== Top panel (Form + Account Info) ====
 		topPanel = new JPanel();
@@ -176,7 +177,7 @@ public class UserManagement extends JPanel {
 		JButton btnSave = addActionButton("Save", new Color(0x353535));
 		btnSave.addActionListener(e -> saveStaff());
 
-		JButton btnUpdate = addActionButton("Save", new Color(0x353535));
+		JButton btnUpdate = addActionButton("Update", new Color(0x353535));
 		btnUpdate.addActionListener(e -> updateStaff());
 
 		JButton btnClear = addActionButton("Clear", new Color(0x353535));
@@ -228,55 +229,69 @@ public class UserManagement extends JPanel {
 
 	// Update Staff
 	private void updateStaff() {
-		if (selectedStaffId == -1) {
-			JOptionPane.showMessageDialog(this, "Please select a staff record to update.", "Error",
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		String name = txtName.getText().trim();
-		String password = txtPassword.getText().trim();
-		String email = txtEmail.getText().trim();
-		String phone = txtPhone.getText().trim();
-		String role = (String) cmbRole.getSelectedItem();
+	    if (selectedStaffId == -1) {
+	        JOptionPane.showMessageDialog(this, "Please select a staff record to update.");
+	        return;
+	    }
 
-		if (name.isEmpty() || password.isEmpty() || email.isEmpty() || phone.isEmpty() || role.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "All fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		} else if (!isEmailFormat(email)) {
+	    String username = txtName.getText().trim();
+	    String email = txtEmail.getText().trim();
+	    String phone = txtPhone.getText().trim();
+	    String role = (String) cmbRole.getSelectedItem();
+
+	    if (username.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "Please fill in all required fields.");
+	        return;
+	    }else if (!isEmailFormat(email)) {
 			JOptionPane.showMessageDialog(this, "Invalid email format! Example: example@domain.com", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			return;
-		} else {
-			UserRepository.updateStaff(selectedStaffId, name, password, email, phone, role);
-			loadStaffData();
-			clearFields();
-		}
+		} 
 
+	    try {
+	        boolean success = UserRepository.updateStaff(selectedStaffId, username, email, phone, role);
+	        if (success) {
+	            JOptionPane.showMessageDialog(this, "Staff updated successfully.");
+	            clearFields();
+	            loadStaffData();
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Failed to update staff.");
+	        }
+	    } catch (SQLException e) {
+	        JOptionPane.showMessageDialog(this, "Error updating staff: " + e.getMessage());
+	        e.printStackTrace(); // Also log for debugging
+	    }
 	}
 
-	// Load staff data
+
 	private void loadStaffData() {
-		tableModel.setRowCount(0);
-		try (ResultSet rs = UserRepository.getAllStaff()) {
-			while (rs.next()) {
-				tableModel.addRow(new Object[] { rs.getInt("staff_id"), rs.getString("username"),
-						rs.getString("password"), rs.getString("email"), rs.getString("phone"), rs.getString("role") });
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	    tableModel.setRowCount(0);
+	    try (ResultSet rs = UserRepository.getAllStaff()) {
+	        while (rs.next()) {
+	            tableModel.addRow(new Object[] {
+	                rs.getInt("staff_id"),
+	                rs.getString("username"),
+	                rs.getString("email"),
+	                rs.getString("phone"),
+	                rs.getString("role")
+	            });
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
 
-	// Clear form fields
 	private void clearFields() {
-		txtName.setText("");
-		txtPassword.setText("");
-		txtEmail.setText("");
-		txtPhone.setText("");
-		cmbRole.setSelectedIndex(0);
-		selectedStaffId = -1;
-		table.clearSelection();
+	    txtName.setText("");
+	    txtPassword.setText("");
+	    txtPassword.setEditable(true); // Re-enable for new entry
+	    txtEmail.setText("");
+	    txtPhone.setText("");
+	    cmbRole.setSelectedIndex(0);
+	    selectedStaffId = -1;
+	    table.clearSelection();
 	}
+
 
 	public static boolean isEmailFormat(String email) {
 		if (email == null || email.trim().isEmpty())
@@ -294,37 +309,43 @@ public class UserManagement extends JPanel {
 		return domainExtension.equalsIgnoreCase("com");
 	}
 
-	// Fill form from table row
 	private void fillFormFromSelectedRow() {
-		int selectedRow = table.getSelectedRow();
-		if (selectedRow != -1) {
-			selectedStaffId = (int) tableModel.getValueAt(selectedRow, 0);
-			txtName.setText((String) tableModel.getValueAt(selectedRow, 1));
-			txtPassword.setText((String) tableModel.getValueAt(selectedRow, 2));
-			txtEmail.setText((String) tableModel.getValueAt(selectedRow, 3));
-			txtPhone.setText((String) tableModel.getValueAt(selectedRow, 4));
-			cmbRole.setSelectedItem((String) tableModel.getValueAt(selectedRow, 5));
-		}
+	    int selectedRow = table.getSelectedRow();
+	    if (selectedRow != -1) {
+	        selectedStaffId = (int) tableModel.getValueAt(selectedRow, 0);
+	        txtName.setText((String) tableModel.getValueAt(selectedRow, 1));
+	        txtEmail.setText((String) tableModel.getValueAt(selectedRow, 2));
+	        txtPhone.setText((String) tableModel.getValueAt(selectedRow, 3));
+	        cmbRole.setSelectedItem((String) tableModel.getValueAt(selectedRow, 4));
+	        txtPassword.setText("");  // Clear it instead
+	        txtPassword.setEditable(false); // Disable password field
+	    }
 	}
 
-	// Search staff
+
 	private void searchStaff() {
-		String keyword = txtSearch.getText().trim();
-		if (keyword.equals("Search") || keyword.isEmpty()) {
-			loadStaffData();
-			return;
-		}
+	    String keyword = txtSearch.getText().trim();
+	    if (keyword.equals("Search") || keyword.isEmpty()) {
+	        loadStaffData();
+	        return;
+	    }
 
-		tableModel.setRowCount(0);
-		try (ResultSet rs = UserRepository.searchStaff(keyword)) {
-			while (rs.next()) {
-				tableModel.addRow(new Object[] { rs.getInt("staff_id"), rs.getString("username"),
-						rs.getString("password"), rs.getString("email"), rs.getString("phone"), rs.getString("role") });
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	    tableModel.setRowCount(0);
+	    try (ResultSet rs = UserRepository.searchStaff(keyword)) {
+	        while (rs.next()) {
+	            tableModel.addRow(new Object[] {
+	                rs.getInt("staff_id"),
+	                rs.getString("username"),
+	                rs.getString("email"),
+	                rs.getString("phone"),
+	                rs.getString("role")
+	            });
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
 	}
+
 
 	private JLabel generateLabel(String label) {
 		JLabel formLabel = new JLabel(label + ":");
@@ -360,28 +381,27 @@ public class UserManagement extends JPanel {
 	}
 
 	private void initTable() {
-		String[] cols = { "StaffId", "Username", "Password", "Email", "Phone", "Role" };
-		tableModel = new DefaultTableModel(cols, 0) {
-			private static final long serialVersionUID = 1L;
+	    String[] cols = { "StaffId", "Username", "Email", "Phone", "Role" }; // Removed "Password"
+	    tableModel = new DefaultTableModel(cols, 0) {
+	        private static final long serialVersionUID = 1L;
 
-			@Override
-			public boolean isCellEditable(int r, int c) {
-				return false;
-			}
-		};
-		table = new JTable(tableModel);
-		table.getTableHeader().setReorderingAllowed(false);
-		table.setRowHeight(40);
-		
-		table.getSelectionModel().addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
-				fillFormFromSelectedRow();
-			}
-		});
+	        @Override
+	        public boolean isCellEditable(int r, int c) {
+	            return false;
+	        }
+	    };
+	    table = new JTable(tableModel);
+	    table.getTableHeader().setReorderingAllowed(false);
+	    table.setRowHeight(40);
 
-		JScrollPane tableScrollPane = new JScrollPane(table);
-//		tableScrollPane.setPreferredSize(new Dimension(700, 280)); // width, height
-		topPanel.add(tableScrollPane, BorderLayout.CENTER);
-		loadStaffData();
+	    table.getSelectionModel().addListSelectionListener(e -> {
+	        if (!e.getValueIsAdjusting()) {
+	            fillFormFromSelectedRow();
+	        }
+	    });
+
+	    JScrollPane tableScrollPane = new JScrollPane(table);
+	    topPanel.add(tableScrollPane, BorderLayout.CENTER);
 	}
+
 }

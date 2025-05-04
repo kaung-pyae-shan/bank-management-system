@@ -25,31 +25,19 @@ public class UserRepository {
 		}
 	}
 
-	// Method to update staff data in the database
-	public static void updateStaff(int staffId, String username, String password, String email, String phone,
-			String role) {
-
-		String sql = "UPDATE staffs SET username = ?, password = ?, email = ?, phone = ?, role = ? WHERE staff_id = ?";
-
-		try (Connection conn = DatabaseConfig.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-			stmt.setString(1, username);
-			stmt.setString(2, password);
-			stmt.setString(3, email);
-			stmt.setString(4, phone);
-			stmt.setString(5, role);
-			stmt.setInt(6, staffId);
-
-			int rowsUpdated = stmt.executeUpdate();
-			if (rowsUpdated > 0) {
-				System.out.println("Staff updated successfully.");
-			} else {
-				System.out.println("No staff found with the provided staff_id.");
-			}
-		} catch (SQLException e) {
-			System.err.println("Error updating staff: " + e.getMessage());
-		}
+	public static boolean updateStaff(int staffId, String username, String email, String phone, String role) throws SQLException {
+	    String sql = "UPDATE staffs SET username=?, email=?, phone=?, role=? WHERE staff_id=?";
+	    try (Connection conn = DatabaseConfig.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setString(1, username);
+	        stmt.setString(2, email);
+	        stmt.setString(3, phone);
+	        stmt.setString(4, role);
+	        stmt.setInt(5, staffId);
+	        return stmt.executeUpdate() > 0;
+	    }
 	}
+
 
 	public static void deleteStaff(int staffId) {
 		String sql = "DELETE FROM staffs WHERE staff_id = ?";
