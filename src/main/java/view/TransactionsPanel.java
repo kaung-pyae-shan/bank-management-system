@@ -9,10 +9,9 @@ import java.awt.FlowLayout;
 import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import controller.TransactionController;
 
@@ -30,14 +29,9 @@ public class TransactionsPanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 
 		// ========= Tabs Section =========
-		JPanel tabWrapper = new JPanel();
-		tabWrapper.setLayout(new BoxLayout(tabWrapper, BoxLayout.Y_AXIS));
-		tabWrapper.setPreferredSize(new Dimension(getWidth(), 100));
-
-//		tabWrapper.add(Box.createVerticalStrut(30));
-		tabWrapper.add(Box.createVerticalGlue());
 
 		JPanel tabPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+		tabPanel.setBorder(new EmptyBorder(40, 0, 0, 0));
 		JButton btnDeposit = addTabButton("Deposit", new Color(0x007030), viewname -> showPanel(viewname));
 		JButton btnWithdraw = addTabButton("Withdraw", new Color(0xe0162b), viewname -> showPanel(viewname));
 		JButton btnTransfer = addTabButton("Transfer", new Color(0x326e9d), viewname -> showPanel(viewname));
@@ -50,11 +44,7 @@ public class TransactionsPanel extends JPanel {
 		btnWithdraw.setPreferredSize(tabButtonSize);
 		btnTransfer.setPreferredSize(tabButtonSize);
 
-		tabWrapper.add(tabPanel);
-		tabWrapper.add(Box.createVerticalGlue());
-		tabWrapper.setBorder(null);
-
-		add(tabWrapper, BorderLayout.NORTH);
+		add(tabPanel, BorderLayout.NORTH);
 
 		// Set the default selected button to "Dashboard"
 		selectedButton = btnDeposit; // Assuming "Dashboard" is the first button added

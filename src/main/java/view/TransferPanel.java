@@ -43,7 +43,7 @@ public class TransferPanel extends JPanel {
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(13, 10, 13, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 		gbc.anchor = GridBagConstraints.WEST;
 		
 		// init textfields;
@@ -65,22 +65,22 @@ public class TransferPanel extends JPanel {
 		gbc.gridy++;
 		add(generateLabel("Current Balance"), gbc);
 		
-		gbc.insets = new Insets(30, 10, 13, 10);
+		gbc.insets = new Insets(35, 10, 15, 10);
 		gbc.gridy++;
 		add(generateLabel("To Account"), gbc);
 		
-		gbc.insets = new Insets(13, 10, 13, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 		gbc.gridy++;
 		add(generateLabel("Account Holder"), gbc);
 		
-		gbc.insets = new Insets(30, 10, 13, 10);
+		gbc.insets = new Insets(35, 10, 15, 10);
 		gbc.gridy++;
 		add(generateLabel("Transfer Amount"), gbc);
 		
 		// Add Form TextFields
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		gbc.insets = new Insets(13, 10, 13, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 		add(fromAccNumberField, gbc);
 		
 		gbc.gridy++;
@@ -92,16 +92,16 @@ public class TransferPanel extends JPanel {
 		add(currentBalanceField, gbc);
 		
 		gbc.gridy++;
-		gbc.insets = new Insets(30, 10, 13, 10);
+		gbc.insets = new Insets(35, 10, 15, 10);
 		add(toAccNumberField, gbc);
 		
 		gbc.gridy++;
-		gbc.insets = new Insets(13, 10, 13, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 		toAccHolderField.setEditable(false);
 		add(toAccHolderField, gbc);
 		
 		gbc.gridy++;
-		gbc.insets = new Insets(30, 10, 13, 10);
+		gbc.insets = new Insets(35, 10, 15, 10);
 		add(amountField, gbc);
 		
 		JButton actionButton = new JButton("Transfer");
@@ -112,15 +112,7 @@ public class TransferPanel extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy++;
 		gbc.insets = new Insets(5, 10, 10, 10);
-		add(actionButton, gbc);
-
-		// Push all form contents to top by adding glue
-		gbc.gridx = 0;
-		gbc.gridy++;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		add(Box.createVerticalGlue(), gbc);
-		
+		add(actionButton, gbc);		
 		
 		fromAccNumberField.addActionListener(new ActionListener() {
 			@Override

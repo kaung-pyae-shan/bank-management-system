@@ -10,7 +10,7 @@ public class Staff {
 	private Role role;
 	
 	public enum Role {
-		ADMIN, ROLE
+		ADMIN, TELLER
 	}
 
 	public int getId() {

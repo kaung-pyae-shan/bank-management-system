@@ -1,6 +1,7 @@
 package repository;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +10,13 @@ import config.DatabaseConfig;
 import model.Transaction.TransactionStatus;
 import model.Transaction.TransactionType;
 import model.dto.RecentTransaction;
+import model.dto.TransactionDetail;
 import utils.ReferenceNumberGenerator;
 
 public class TransactionRepository {
-	
+
 	private ReferenceNumberGenerator rnGenerator;
-	
+
 	public TransactionRepository(ReferenceNumberGenerator rnGenerator) {
 		this.rnGenerator = rnGenerator;
 	}
@@ -31,8 +33,8 @@ public class TransactionRepository {
 			System.out.println("Failed to fetch Pending transactions count");
 		}
 		return 0L;
-	}	
-	
+	}
+
 	public int updateTransactionStatus(int trxId, TransactionStatus status) {
 		final String sql = "UPDATE transactions SET status = ? WHERE transaction_id = ?";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
@@ -45,7 +47,7 @@ public class TransactionRepository {
 		}
 		return 0;
 	}
-	
+
 	public List<RecentTransaction> searchLast24HrTransactions() {
 		final String sql = """
 				SELECT
@@ -63,13 +65,13 @@ public class TransactionRepository {
 				    customer_accounts ca ON a.account_id = ca.account_id
 				JOIN
 				    customers c ON ca.customer_id = c.customer_id
-				WHERE 
+				WHERE
 					transaction_date >= NOW() - INTERVAL 24 HOUR;
 								""";
 		List<RecentTransaction> recents = new ArrayList<>();
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			var rs = stmt.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				String referenceNumber = rs.getString(1);
 				String cusName = rs.getString(2);
 				TransactionType trxType = TransactionType.valueOf(rs.getString(3));
@@ -84,7 +86,7 @@ public class TransactionRepository {
 		}
 		return null;
 	}
-	
+
 	public List<RecentTransaction> searchLast24HrTransactionsByStaffId(int staffId) {
 		final String sql = """
 				SELECT
@@ -102,14 +104,14 @@ public class TransactionRepository {
 				    customer_accounts ca ON a.account_id = ca.account_id
 				JOIN
 				    customers c ON ca.customer_id = c.customer_id
-				WHERE 
+				WHERE
 					transaction_date >= NOW() - INTERVAL 24 HOUR and processed_by = ?;
 								""";
 		List<RecentTransaction> recents = new ArrayList<>();
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			stmt.setInt(1, staffId);
 			var rs = stmt.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				String referenceNumber = rs.getString(1);
 				String cusName = rs.getString(2);
 				TransactionType trxType = TransactionType.valueOf(rs.getString(3));
@@ -124,7 +126,7 @@ public class TransactionRepository {
 		}
 		return null;
 	}
-	
+
 	public long countTodayTransactions() {
 		final String sql = """
 				SELECT
@@ -137,7 +139,7 @@ public class TransactionRepository {
 				    customer_accounts ca ON a.account_id = ca.account_id
 				JOIN
 				    customers c ON ca.customer_id = c.customer_id
-				WHERE 
+				WHERE
 					DATE(transaction_date) = CURDATE();
 								""";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
@@ -150,7 +152,7 @@ public class TransactionRepository {
 		}
 		return 0;
 	}
-	
+
 	public long countTodayTransactionsByStaffId(int staffId) {
 		final String sql = """
 				SELECT
@@ -163,7 +165,7 @@ public class TransactionRepository {
 				    customer_accounts ca ON a.account_id = ca.account_id
 				JOIN
 				    customers c ON ca.customer_id = c.customer_id
-				WHERE 
+				WHERE
 					DATE(transaction_date) = CURDATE() and processed_by = ?;
 								""";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
@@ -177,7 +179,7 @@ public class TransactionRepository {
 		}
 		return 0;
 	}
-	
+
 	public int addDepositTransaction(int toAccountId, TransactionType type, BigDecimal amount, int processedBy) {
 		final String sql = """
 				INSERT INTO transactions
@@ -197,7 +199,7 @@ public class TransactionRepository {
 		}
 		return 0;
 	}
-	
+
 	public int addWithdrawTransaction(int fromAccountId, TransactionType type, BigDecimal amount, int processedBy) {
 		final String sql = """
 				INSERT INTO transactions
@@ -217,8 +219,9 @@ public class TransactionRepository {
 		}
 		return 0;
 	}
-	
-	public int addTransferTransaction(int fromAccountId, int toAccountId, TransactionType type, BigDecimal amount, int processedBy) {
+
+	public int addTransferTransaction(int fromAccountId, int toAccountId, TransactionType type, BigDecimal amount,
+			int processedBy) {
 		final String sql = """
 				INSERT INTO transactions
 				(from_account_id, to_account_id, transaction_type, amount, reference_number, processed_by) VALUES
@@ -237,5 +240,46 @@ public class TransactionRepository {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+
+	public List<TransactionDetail> findAllTransactionDetails() {
+		final String sql = """
+				SELECT
+				    t.reference_number,
+				    t.transaction_date,
+				    t.transaction_type,
+				    t.amount,
+				    a1.account_number AS from_account_number,
+				    a2.account_number AS to_account_number,
+				    s.username,
+				    t.processed_by
+				FROM
+				    transactions t
+				LEFT JOIN
+				    accounts a1 ON t.from_account_id = a1.account_id
+				LEFT JOIN
+				    accounts a2 ON t.to_account_id = a2.account_id
+				LEFT JOIN
+				    staffs s ON t.processed_by = s.staff_id;
+								""";
+		List<TransactionDetail> transactionDetails = new ArrayList<>();
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			var rs = stmt.executeQuery();
+			while(rs.next()) {
+				TransactionDetail detail = new TransactionDetail(
+											rs.getString("reference_number"), 
+											rs.getTimestamp("transaction_date").toLocalDateTime(),
+											TransactionType.valueOf(rs.getString("transaction_type")),
+											rs.getBigDecimal("amount"),
+											rs.getString("from_account_number"),
+											rs.getString("to_account_number"),
+											rs.getString("username") + " (ID: " + rs.getInt("processed_by") + ")");
+				transactionDetails.add(detail);
+			}
+			return transactionDetails;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

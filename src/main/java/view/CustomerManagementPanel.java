@@ -34,6 +34,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -70,6 +72,7 @@ public class CustomerManagementPanel extends JPanel {
 	JTextField nrcNumberField;
 	JPanel accountPanel;
 	JPanel accountInfoPanel;
+	JPanel centerPanel;
 	JLabel numAccountValueLbl;
 
 	DefaultTableModel tableModel;
@@ -85,10 +88,11 @@ public class CustomerManagementPanel extends JPanel {
 
 	public CustomerManagementPanel(CustomerController controller, int loggedInStaffId) {
 		this.controller = controller;
-		setLayout(new BorderLayout(0, 5));
+		setLayout(new BorderLayout(0, 20));
 
 		// ==== Search bar panel ====
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		searchBarPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		JTextField searchField = new JTextField(20);
 		searchField.setText("Search by NRC");
 		searchBarPanel.add(searchField);
@@ -116,7 +120,7 @@ public class CustomerManagementPanel extends JPanel {
 
 		// == Form ==
 		JPanel formPanel = new JPanel(new GridBagLayout());
-		formPanel.setPreferredSize(new Dimension(400, 320)); // Set preferred size
+//		formPanel.setPreferredSize(new Dimension(400, 320)); // Set preferred size
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(13, 10, 13, 10);
 		gbc.anchor = GridBagConstraints.WEST;
@@ -248,8 +252,10 @@ public class CustomerManagementPanel extends JPanel {
 		// == Account Details Panel ==
 		cardLayout = new CardLayout();
 		accountPanel = new JPanel(cardLayout);
-		accountPanel.setPreferredSize(new Dimension(300, 300));
-		JPanel emptyPanel = new JPanel();
+//		accountPanel.setPreferredSize(new Dimension(300, 300));
+		JPanel emptyPanel = new JPanel(new BorderLayout());
+		JLabel emptyLabel = new JLabel("No customer is selected!", SwingConstants.CENTER);
+		emptyPanel.add(emptyLabel, BorderLayout.CENTER);
 		accountInfoPanel = new JPanel(new GridBagLayout());
 		JScrollPane accountInfoScroll = new JScrollPane(accountInfoPanel);
 		accountInfoScroll.setBorder(BorderFactory.createEmptyBorder());
@@ -261,11 +267,15 @@ public class CustomerManagementPanel extends JPanel {
 
 		topPanel.add(formPanel);
 		topPanel.add(accountPanel);
+		
+		centerPanel = new JPanel(new BorderLayout(0, 20));
 
 		add(searchBarPanel, BorderLayout.NORTH);
-		add(topPanel, BorderLayout.CENTER);
-//		add(tableScrollPane, BorderLayout.SOUTH);
+		centerPanel.add(topPanel, BorderLayout.NORTH);
 		initTable();
+		add(centerPanel, BorderLayout.CENTER);
+//		add(topPanel, BorderLayout.CENTER);
+//		add(tableScrollPane, BorderLayout.SOUTH);
 		refreshTable(controller.fetchCustomers());
 
 		datePicker.addPropertyChangeListener("date", new PropertyChangeListener() {
@@ -401,8 +411,8 @@ public class CustomerManagementPanel extends JPanel {
 			}
 		});
 		JScrollPane tableScrollPane = new JScrollPane(table);
-		tableScrollPane.setPreferredSize(new Dimension(700, 280)); // width, height
-		add(tableScrollPane, BorderLayout.SOUTH);
+//		tableScrollPane.setPreferredSize(new Dimension(700, 280)); // width, height
+		centerPanel.add(tableScrollPane, BorderLayout.CENTER);
 	}
 
 	private void refreshTable(List<Customer> customerlist) {

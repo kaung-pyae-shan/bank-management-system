@@ -85,7 +85,7 @@ public class CardRepository {
 			stmt.setObject(4, java.time.LocalDate.now());
 			stmt.setObject(5, java.time.LocalDate.now().plusYears(5));
 			stmt.setString(6, status);
-			stmt.setInt(7, 6);
+			stmt.setInt(7, 3);
 
 			int rowsInserted = stmt.executeUpdate();
 			return rowsInserted > 0;
