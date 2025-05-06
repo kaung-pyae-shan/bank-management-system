@@ -33,7 +33,7 @@ public class TransactionLogsPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	public TransactionLogsPanel(TransactionController controller, int loggedInStaffId) {
+	public TransactionLogsPanel(TransactionController controller, int loggedInStaffId, Role role) {
 		this.controller = controller;
 		setLayout(new BorderLayout(0, 20));
 
@@ -53,18 +53,17 @@ public class TransactionLogsPanel extends JPanel {
 		formFieldPanel.add(sortPanel, BorderLayout.WEST);
 		formFieldPanel.add(searchField, BorderLayout.EAST);
 
-		initTable(loggedInStaffId);
-		refreshTable(controller.fetchAllTransactionDetails());
+		initTable(loggedInStaffId, role);
+		refreshTable(controller.fetchAllTransactionDetails(loggedInStaffId, role));
 		add(formFieldPanel, BorderLayout.NORTH);
 
 	}
 
-	private void initTable(int staffId) {
+	private void initTable(int staffId, Role role) {
 		String[] adminCols = { "Reference No.", "Timestamp", "Type", "Amount", "FromAccount", "ToAccount",
 				"PerformedBy"};
 		String[] tellerCols = { "Reference No.", "Timestamp", "Type", "Amount", "FromAccount", "ToAccount" };
 
-		Role role = controller.fetchRoleForLoggedInStaff(staffId);
 		String[] columns = role == Role.ADMIN ? adminCols : tellerCols;
 		tableModel = new DefaultTableModel(columns, 0) {
 			private static final long serialVersionUID = 1L;

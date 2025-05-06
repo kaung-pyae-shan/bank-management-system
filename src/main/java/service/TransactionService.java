@@ -3,6 +3,7 @@ package service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import model.Staff.Role;
 import model.Transaction.TransactionType;
 import model.dto.DepositWithdrawForm;
 import model.dto.TransactionDetail;
@@ -51,7 +52,11 @@ public class TransactionService {
 		return row;
 	}
 	
-	public List<TransactionDetail> getAllTransactionDetails() {
-		return transactionRepo.findAllTransactionDetails();
+	public List<TransactionDetail> getAllTransactionDetails(int loggedInStaffId, Role role) {
+		if(role == Role.ADMIN) {
+			return transactionRepo.findAllTransactionDetails();			
+		} else {
+			return transactionRepo.findTransactionDetailsByStaffId(loggedInStaffId);
+		}
 	}
 }

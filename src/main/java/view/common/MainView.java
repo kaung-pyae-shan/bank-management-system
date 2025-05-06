@@ -10,8 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import config.DependenciesConfig;
+import model.Staff.Role;
 import utils.UpdateablePanel;
 import view.AccountManagementPanel;
+import view.AdminDashboardPanel;
+import view.AdminMenuPanel;
 import view.CardManagement;
 import view.CustomerManagementPanel;
 import view.InterestManagementPanel;
@@ -28,7 +31,7 @@ public class MainView extends JFrame {
 	private JPanel mainContentPanel;
 	private CardLayout cardLayout;
 
-	public MainView(DependenciesConfig config, int loggedInStaffId) {
+	public MainView(DependenciesConfig config, int loggedInStaffId, Role role) {
 		
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,11 +43,15 @@ public class MainView extends JFrame {
 		setContentPane(contentPane);
 
 		// 🔹 Init menu with listener
-		// --------------Add Login logic here----------------------
-//		AdminMenuPanel adminMenuPanel = new AdminMenuPanel(viewName -> showPanel(viewName));
-		TellerMenuPanel tellerMenuPanel = new TellerMenuPanel(viewName -> showPanel(viewName));
-		tellerMenuPanel.setPreferredSize(new Dimension(300, 700));
-		contentPane.add(tellerMenuPanel, BorderLayout.WEST);
+		if(role == Role.ADMIN) {
+			AdminMenuPanel adminMenuPanel = new AdminMenuPanel(viewName -> showPanel(viewName));
+			contentPane.add(adminMenuPanel, BorderLayout.WEST);	
+			adminMenuPanel.setPreferredSize(new Dimension(300, 700));
+		} else if(role == Role.TELLER) {
+			TellerMenuPanel tellerMenuPanel = new TellerMenuPanel(viewName -> showPanel(viewName));
+			contentPane.add(tellerMenuPanel, BorderLayout.WEST);	
+			tellerMenuPanel.setPreferredSize(new Dimension(300, 700));
+		}
 
 		// 🔹 Init main content area with CardLayout
 		cardLayout = new CardLayout();
@@ -53,16 +60,18 @@ public class MainView extends JFrame {
 		contentPane.add(mainContentPanel, BorderLayout.CENTER);
 
 		// 🔹 Add views to the CardLayout
-		// ------------------- Add login logic here -----------------------
-//		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
-		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController(), loggedInStaffId), "Dashboard");
+		if(role == Role.ADMIN) {
+			mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
+		} else if(role == Role.TELLER) {
+			mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController(), loggedInStaffId), "Dashboard");
+		}
 		mainContentPanel.add(new UserManagement(), "User Management");
 		mainContentPanel.add(new CustomerManagementPanel(config.getCustomerController(), loggedInStaffId), "Customer Management");
 		mainContentPanel.add(new AccountManagementPanel(), "Account Management");
 		mainContentPanel.add(new CardManagement(), "Card Management");
 		mainContentPanel.add(new TransactionsPanel(config.getTransactionController(), loggedInStaffId), "Transactions");
 		mainContentPanel.add(new InterestManagementPanel(), "Interest Management");
-		mainContentPanel.add(new TransactionLogsPanel(config.getTransactionController(), loggedInStaffId), "Transaction Logs");
+		mainContentPanel.add(new TransactionLogsPanel(config.getTransactionController(), loggedInStaffId, role), "Transaction Logs");
 		// Add more panels later: e.g. mainContentPanel.add(new CustomerPanel(), "Customers");
 
 		// Show default

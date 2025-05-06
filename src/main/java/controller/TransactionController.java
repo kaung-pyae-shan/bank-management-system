@@ -33,11 +33,7 @@ public class TransactionController {
 		return service.updateBalance(amount, TransactionType.TRANSFER, fromAccountId, toAccountId, processedBy);
 	}
 	
-	public Role fetchRoleForLoggedInStaff(int loggedInStaffId) {
-		return Role.ADMIN;
-	}
-	
-	public List<TransactionDetail> fetchAllTransactionDetails() {
-		return service.getAllTransactionDetails();
+	public List<TransactionDetail> fetchAllTransactionDetails(int loggedInStaffId, Role role) {
+		return service.getAllTransactionDetails(loggedInStaffId, role);
 	}
 }

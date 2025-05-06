@@ -282,4 +282,48 @@ public class TransactionRepository {
 		}
 		return null;
 	}
+
+	public List<TransactionDetail> findTransactionDetailsByStaffId(int loggedInStaffId) {
+		final String sql = """
+				SELECT
+				    t.reference_number,
+				    t.transaction_date,
+				    t.transaction_type,
+				    t.amount,
+				    a1.account_number AS from_account_number,
+				    a2.account_number AS to_account_number,
+				    s.username,
+				    t.processed_by
+				FROM
+				    transactions t
+				LEFT JOIN
+				    accounts a1 ON t.from_account_id = a1.account_id
+				LEFT JOIN
+				    accounts a2 ON t.to_account_id = a2.account_id
+				LEFT JOIN
+				    staffs s ON t.processed_by = s.staff_id
+				WHERE 
+					s.staff_id = ?;
+								""";
+		List<TransactionDetail> transactionDetails = new ArrayList<>();
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, loggedInStaffId);
+			var rs = stmt.executeQuery();
+			while(rs.next()) {
+				TransactionDetail detail = new TransactionDetail(
+											rs.getString("reference_number"), 
+											rs.getTimestamp("transaction_date").toLocalDateTime(),
+											TransactionType.valueOf(rs.getString("transaction_type")),
+											rs.getBigDecimal("amount"),
+											rs.getString("from_account_number"),
+											rs.getString("to_account_number"),
+											rs.getString("username") + " (ID: " + rs.getInt("processed_by") + ")");
+				transactionDetails.add(detail);
+			}
+			return transactionDetails;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }
