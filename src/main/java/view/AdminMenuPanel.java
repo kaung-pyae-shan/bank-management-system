@@ -46,7 +46,6 @@ public class AdminMenuPanel extends JPanel {
 		addNavButton("Transactions", navCallback);
 		addNavButton("Interest Management", navCallback);
 		addNavButton("Transaction Logs", navCallback);
-		addNavButton("Account Status Control", navCallback);
 
 		// Push everything above up
 		add(Box.createVerticalGlue());

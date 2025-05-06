@@ -12,15 +12,14 @@ import javax.swing.JPanel;
 import config.DependenciesConfig;
 import utils.UpdateablePanel;
 import view.AccountManagementPanel;
-import view.AccountStatusControlPanel;
-import view.AdminDashboardPanel;
-import view.AdminMenuPanel;
-import view.CardManagementPanel;
+import view.CardManagement;
 import view.CustomerManagementPanel;
 import view.InterestManagementPanel;
+import view.TellerDashboardPanel;
+import view.TellerMenuPanel;
 import view.TransactionLogsPanel;
 import view.TransactionsPanel;
-import view.UserManagementPanel;
+import view.UserManagement;
 
 public class MainView extends JFrame {
 
@@ -29,22 +28,23 @@ public class MainView extends JFrame {
 	private JPanel mainContentPanel;
 	private CardLayout cardLayout;
 
-	public MainView(DependenciesConfig config) {
+	public MainView(DependenciesConfig config, int loggedInStaffId) {
 		
-		setResizable(false);
+		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1200, 700);
 		setTitle("Bank Management System");
+		setLocationRelativeTo(null);
 
 		contentPane = new JPanel(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 
 		// 🔹 Init menu with listener
 		// --------------Add Login logic here----------------------
-		AdminMenuPanel adminMenuPanel = new AdminMenuPanel(viewName -> showPanel(viewName));
-//		TellerMenuPanel tellerMenuPanel = new TellerMenuPanel(viewName -> showPanel(viewName));
-		adminMenuPanel.setPreferredSize(new Dimension(300, 700));
-		contentPane.add(adminMenuPanel, BorderLayout.WEST);
+//		AdminMenuPanel adminMenuPanel = new AdminMenuPanel(viewName -> showPanel(viewName));
+		TellerMenuPanel tellerMenuPanel = new TellerMenuPanel(viewName -> showPanel(viewName));
+		tellerMenuPanel.setPreferredSize(new Dimension(300, 700));
+		contentPane.add(tellerMenuPanel, BorderLayout.WEST);
 
 		// 🔹 Init main content area with CardLayout
 		cardLayout = new CardLayout();
@@ -54,16 +54,15 @@ public class MainView extends JFrame {
 
 		// 🔹 Add views to the CardLayout
 		// ------------------- Add login logic here -----------------------
-		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
-//		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController()), "Dashboard");
-		mainContentPanel.add(new UserManagementPanel(), "User Management");
-		mainContentPanel.add(new CustomerManagementPanel(config.getCustomerController()), "Customer Management");
+//		mainContentPanel.add(new AdminDashboardPanel(config.getDashboardController()), "Dashboard");
+		mainContentPanel.add(new TellerDashboardPanel(config.getDashboardController(), loggedInStaffId), "Dashboard");
+		mainContentPanel.add(new UserManagement(), "User Management");
+		mainContentPanel.add(new CustomerManagementPanel(config.getCustomerController(), loggedInStaffId), "Customer Management");
 		mainContentPanel.add(new AccountManagementPanel(), "Account Management");
-		mainContentPanel.add(new CardManagementPanel(), "Card Management");
-		mainContentPanel.add(new TransactionsPanel(config.getTransactionController()), "Transactions");
+		mainContentPanel.add(new CardManagement(), "Card Management");
+		mainContentPanel.add(new TransactionsPanel(config.getTransactionController(), loggedInStaffId), "Transactions");
 		mainContentPanel.add(new InterestManagementPanel(), "Interest Management");
-		mainContentPanel.add(new TransactionLogsPanel(), "Transaction Logs");
-		mainContentPanel.add(new AccountStatusControlPanel(), "Account Status Control");
+		mainContentPanel.add(new TransactionLogsPanel(config.getTransactionController(), loggedInStaffId), "Transaction Logs");
 		// Add more panels later: e.g. mainContentPanel.add(new CustomerPanel(), "Customers");
 
 		// Show default

@@ -1,9 +1,12 @@
 package controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import model.Staff.Role;
 import model.Transaction.TransactionType;
 import model.dto.DepositWithdrawForm;
+import model.dto.TransactionDetail;
 import service.TransactionService;
 
 public class TransactionController {
@@ -28,5 +31,13 @@ public class TransactionController {
 	
 	public int transfer(int fromAccountId, int toAccountId, BigDecimal amount, int processedBy) {
 		return service.updateBalance(amount, TransactionType.TRANSFER, fromAccountId, toAccountId, processedBy);
+	}
+	
+	public Role fetchRoleForLoggedInStaff(int loggedInStaffId) {
+		return Role.ADMIN;
+	}
+	
+	public List<TransactionDetail> fetchAllTransactionDetails() {
+		return service.getAllTransactionDetails();
 	}
 }

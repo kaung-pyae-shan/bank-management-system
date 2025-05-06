@@ -29,8 +29,7 @@ public class CardManagementPanel extends JPanel {
 		setPreferredSize(new Dimension(900, 650));
 
 		txtSearch = new JTextField();
-		txtSearch.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		txtSearch.setBounds(200, 14, 200, 24);
+		txtSearch.setBounds(340, 7, 200, 18);
 		add(txtSearch);
 
 		txtSearch.addKeyListener(new KeyAdapter() {
@@ -42,23 +41,23 @@ public class CardManagementPanel extends JPanel {
 		});
 
 		JLabel lblAccountNumber_1 = new JLabel("Card Number");
-		lblAccountNumber_1.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblAccountNumber_1.setBounds(84, 67, 146, 18);
+		lblAccountNumber_1.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblAccountNumber_1.setBounds(70, 50, 146, 18);
 		add(lblAccountNumber_1);
 
 		lblCardNo = new JLabel(generateCardNumber());
-		lblCardNo.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblCardNo.setBounds(240, 67, 200, 18);
+		lblCardNo.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblCardNo.setBounds(200, 50, 200, 18);
 		add(lblCardNo);
 
 		JLabel lblAccountNumber = new JLabel("Account Number");
-		lblAccountNumber.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblAccountNumber.setBounds(84, 100, 146, 18);
+		lblAccountNumber.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblAccountNumber.setBounds(70, 90, 146, 18);
 		add(lblAccountNumber);
 
 		txtAccountNumber = new JTextField();
-		txtAccountNumber.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		txtAccountNumber.setBounds(240, 99, 164, 24);
+		txtAccountNumber.setFont(new Font("Dialog", Font.BOLD, 13));
+		txtAccountNumber.setBounds(200, 90, 260, 20);
 		add(txtAccountNumber);
 
 		txtAccountNumber.addKeyListener(new KeyAdapter() {
@@ -71,53 +70,53 @@ public class CardManagementPanel extends JPanel {
 		});
 
 		JLabel lblAccountHolder = new JLabel("Account Holder");
-		lblAccountHolder.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblAccountHolder.setBounds(84, 139, 146, 18);
+		lblAccountHolder.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblAccountHolder.setBounds(70, 130, 146, 18);
 		add(lblAccountHolder);
 
 		txtAccountHolder = new JTextField();
-		txtAccountHolder.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		txtAccountHolder.setBounds(240, 137, 164, 24);
+		txtAccountHolder.setFont(new Font("Dialog", Font.BOLD, 13));
+		txtAccountHolder.setBounds(200, 130, 260, 20);
 		add(txtAccountHolder);
 
 		JLabel lblEmail = new JLabel("Email");
-		lblEmail.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblEmail.setBounds(84, 176, 146, 18);
+		lblEmail.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblEmail.setBounds(70, 170, 146, 18);
 		add(lblEmail);
 
 		txtEmail = new JTextField();
-		txtEmail.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		txtEmail.setBounds(240, 175, 164, 24);
+		txtEmail.setFont(new Font("Dialog", Font.BOLD, 13));
+		txtEmail.setBounds(200, 170, 260, 20);
 		add(txtEmail);
 
 		JLabel lblPhone = new JLabel("Phone");
-		lblPhone.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblPhone.setBounds(84, 217, 146, 18);
+		lblPhone.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblPhone.setBounds(70, 210, 146, 18);
 		add(lblPhone);
 
 		txtPhone = new JTextField();
-		txtPhone.setFont(new Font("Times New Roman", Font.PLAIN, 12));
-		txtPhone.setBounds(240, 216, 164, 24);
+		txtPhone.setFont(new Font("Dialog", Font.BOLD, 13));
+		txtPhone.setBounds(200, 210, 260, 20);
 		add(txtPhone);
 
-		JComboBox<String> cmbCardType = new JComboBox<>(new String[] { "", "CREDIT", "DEBIT" });
+		JComboBox<String> cmbCardType = new JComboBox<>(new String[] { "Select type", "CREDIT", "DEBIT" });
 		cmbCardType.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		cmbCardType.setBounds(241, 258, 163, 26);
+		cmbCardType.setBounds(200, 250, 260, 20);
 		add(cmbCardType);
 
-		JComboBox<String> cmbStatus = new JComboBox<>(new String[] { "", "ACTIVE", "INACTIVE", "EXPIRED" });
+		JComboBox<String> cmbStatus = new JComboBox<>(new String[] { "Select status", "ACTIVE", "INACTIVE", "EXPIRED" });
 		cmbStatus.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		cmbStatus.setBounds(240, 298, 163, 26);
+		cmbStatus.setBounds(200, 290, 260, 20);
 		add(cmbStatus);
 
 		JLabel lblCardType = new JLabel("Card Type");
-		lblCardType.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblCardType.setBounds(84, 260, 146, 18);
+		lblCardType.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblCardType.setBounds(70, 250, 146, 18);
 		add(lblCardType);
 
 		JLabel lblStatus = new JLabel("Status");
-		lblStatus.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-		lblStatus.setBounds(84, 300, 146, 18);
+		lblStatus.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblStatus.setBounds(70, 290, 146, 18);
 		add(lblStatus);
 
 		JButton btnSave = new JButton("Save");
@@ -155,7 +154,7 @@ public class CardManagementPanel extends JPanel {
 			}
 		});
 		btnSave.setFont(new Font("Times New Roman", Font.BOLD, 12));
-		btnSave.setBounds(202, 355, 112, 27);
+		btnSave.setBounds(200, 330, 112, 27);
 		add(btnSave);
 
 		JButton btnClear = new JButton("Clear");
@@ -168,7 +167,7 @@ public class CardManagementPanel extends JPanel {
 			cmbStatus.setSelectedIndex(0);
 		});
 		btnClear.setFont(new Font("Times New Roman", Font.BOLD, 12));
-		btnClear.setBounds(335, 355, 112, 27);
+		btnClear.setBounds(335, 330, 112, 27);
 		add(btnClear);
 
 		JPanel panel = new JPanel();

@@ -1,9 +1,11 @@
 package service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import model.Transaction.TransactionType;
 import model.dto.DepositWithdrawForm;
+import model.dto.TransactionDetail;
 import repository.AccountRepository;
 import repository.TransactionRepository;
 
@@ -47,5 +49,9 @@ public class TransactionService {
 			row = 0;
 		}
 		return row;
+	}
+	
+	public List<TransactionDetail> getAllTransactionDetails() {
+		return transactionRepo.findAllTransactionDetails();
 	}
 }

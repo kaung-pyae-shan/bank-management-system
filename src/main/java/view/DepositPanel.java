@@ -39,12 +39,12 @@ public class DepositPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public DepositPanel(TransactionController controller) {
+	public DepositPanel(TransactionController controller, int loggedInStaffId) {
 		// ==== Form Panel ====
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(13, 10, 13, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 		gbc.anchor = GridBagConstraints.WEST;
 
 		String[] labels = { "Account Number", "Account Holder", "Email", "Phone", "Address", "Customer Since",
@@ -77,7 +77,7 @@ public class DepositPanel extends JPanel {
 		currentBalanceField = new JTextField(25);
 		amountField = new JTextField(25);
 		
-		gbc.insets = new Insets(10, 10, 10, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -108,7 +108,7 @@ public class DepositPanel extends JPanel {
 		add(currentBalanceField, gbc);
 		
 		gbc.gridy = 7;
-		gbc.insets = new Insets(30, 10, 10, 10);
+		gbc.insets = new Insets(35, 10, 10, 10);
 		add(amountField, gbc);
 
 		JButton actionButton = new JButton("Deposit");
@@ -120,14 +120,6 @@ public class DepositPanel extends JPanel {
 		gbc.gridy++;
 		gbc.insets = new Insets(5, 10, 10, 10);
 		add(actionButton, gbc);
-
-		// Push all form contents to top by adding glue
-		gbc.gridx = 0;
-		gbc.gridy++;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		add(Box.createVerticalGlue(), gbc);
-		
 		
 		accNumberField.addActionListener(new ActionListener() {
 			@Override
@@ -160,7 +152,7 @@ public class DepositPanel extends JPanel {
 				BigDecimal amount = new BigDecimal(0);
 				try {
 					amount = new BigDecimal(amountField.getText());
-					int row = controller.depositBalance(amount, currentAccountId, 1);
+					int row = controller.depositBalance(amount, currentAccountId, loggedInStaffId);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Deposited successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(accNumberField.getText());

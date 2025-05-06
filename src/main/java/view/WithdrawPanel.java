@@ -39,12 +39,12 @@ public class WithdrawPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public WithdrawPanel(TransactionController controller) {
+	public WithdrawPanel(TransactionController controller, int loggedInStaffId) {
 		// ==== Form Panel ====
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets(13, 10, 13, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 		gbc.anchor = GridBagConstraints.WEST;
 
 		String[] labels = { "Account Number", "Account Holder", "Email", "Phone", "Address", "Customer Since",
@@ -59,7 +59,7 @@ public class WithdrawPanel extends JPanel {
 			formLabel.setFont(new Font("Dialog", Font.BOLD, 13));
 	
 			if(label.equals("Withdraw Amount")) {
-				gbc.insets = new Insets(30, 10, 13, 10);
+				gbc.insets = new Insets(35, 10, 13, 10);
 				add((formLabel), gbc);
 				continue;
 			}
@@ -77,7 +77,7 @@ public class WithdrawPanel extends JPanel {
 		currentBalanceField = new JTextField(25);
 		amountField = new JTextField(25);
 		
-		gbc.insets = new Insets(10, 10, 10, 10);
+		gbc.insets = new Insets(15, 10, 15, 10);
 
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -108,7 +108,7 @@ public class WithdrawPanel extends JPanel {
 		add(currentBalanceField, gbc);
 		
 		gbc.gridy = 7;
-		gbc.insets = new Insets(30, 10, 10, 10);
+		gbc.insets = new Insets(35, 10, 10, 10);
 		add(amountField, gbc);
 
 		JButton actionButton = new JButton("Withdraw");
@@ -119,15 +119,7 @@ public class WithdrawPanel extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy++;
 		gbc.insets = new Insets(5, 10, 10, 10);
-		add(actionButton, gbc);
-
-		// Push all form contents to top by adding glue
-		gbc.gridx = 0;
-		gbc.gridy++;
-		gbc.weighty = 1.0;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		add(Box.createVerticalGlue(), gbc);
-		
+		add(actionButton, gbc);	
 		
 		accNumberField.addActionListener(new ActionListener() {
 			@Override
@@ -164,7 +156,7 @@ public class WithdrawPanel extends JPanel {
 						JOptionPane.showMessageDialog(null,  "Insufficient Balance!!", "Failed", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int row = controller.withdrawBalance(amount, currentAccountId, 1);
+					int row = controller.withdrawBalance(amount, currentAccountId, loggedInStaffId);
 					if (row > 0) {
 						JOptionPane.showMessageDialog(null,  "Withdrawn successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(accNumberField.getText());

@@ -32,12 +32,13 @@ public class TellerDashboardPanel extends JPanel implements UpdateablePanel {
 	private JScrollPane tableScroll;
 	private JPanel centerPanel;
 	private JTable table;
-	private int staffId = 1;
+	private int loggedInStaffId;
 
 	private JLabel customerValueLabel, accountValueLabel, cardValueLabel, transactionValueLabel;
 
-	public TellerDashboardPanel(DashboardController controller) {
+	public TellerDashboardPanel(DashboardController controller, int loggedInStaffId) {
 		this.controller = controller;
+		this.loggedInStaffId = loggedInStaffId;
 		setLayout(new BorderLayout(20, 20));
 		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -61,7 +62,7 @@ public class TellerDashboardPanel extends JPanel implements UpdateablePanel {
 		transactionValueLabel = new JLabel();
 
 		// --------------------------------------- Add Login Staff Id ----------------------------
-		TellerDashboardStats stats = controller.fetchTellerDashboardStats(staffId);
+		TellerDashboardStats stats = controller.fetchTellerDashboardStats(loggedInStaffId);
 		// --------------------------------------- Add Login Staff Id ----------------------------
 		customerValueLabel.setText(String.valueOf(stats.getCustomers()));
 		accountValueLabel.setText(String.valueOf(stats.getAccounts()));
@@ -122,7 +123,7 @@ public class TellerDashboardPanel extends JPanel implements UpdateablePanel {
 		// Fetch the data from the controller
 		// --------------------------------------- Add Login Staff Id
 		// ----------------------------
-		List<RecentTransaction> transactions = controller.fetchTellerDashboardTable(staffId);
+		List<RecentTransaction> transactions = controller.fetchTellerDashboardTable(loggedInStaffId);
 		// --------------------------------------- Add Login Staff Id
 		// ----------------------------
 
@@ -174,14 +175,14 @@ public class TellerDashboardPanel extends JPanel implements UpdateablePanel {
 	@Override
 	public void updateData() {
 		// Fetch updated stats
-		TellerDashboardStats stats = controller.fetchTellerDashboardStats(staffId);
+		TellerDashboardStats stats = controller.fetchTellerDashboardStats(loggedInStaffId);
 	    customerValueLabel.setText(String.valueOf(stats.getCustomers()));
 		accountValueLabel.setText(String.valueOf(stats.getAccounts()));
 		cardValueLabel.setText(String.valueOf(stats.getCards()));
 		transactionValueLabel.setText(String.valueOf(stats.getTransactionTodays()));
 
 	    // Create a new table
-	    JTable newTable = generateTable(staffId);
+	    JTable newTable = generateTable(loggedInStaffId);
 	    JScrollPane newTableScroll = new JScrollPane(newTable);
 
 	    // Remove the old table scroll pane if it exists
