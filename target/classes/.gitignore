@@ -1,8 +1,9 @@
-/META-INF/
-/view/
-/repository/
 /model/
-/service/
+/Main.class
 /config/
 /controller/
+/repository/
+/view/
+/service/
 /utils/
+/META-INF/
