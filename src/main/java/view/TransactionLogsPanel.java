@@ -3,12 +3,7 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -21,7 +16,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import controller.TransactionController;
-import model.Customer;
 import model.Staff.Role;
 import model.dto.TransactionDetail;
 
@@ -42,7 +36,6 @@ public class TransactionLogsPanel extends JPanel {
 
 		JLabel sortLbl = new JLabel("Sort by: ");
 		JComboBox<String> sortCb = new JComboBox<>(new String[] { "Newest first", "Oldest first" });
-//		sortCb.setPreferredSize(new Dimension(140, 25));
 		JPanel sortPanel = new JPanel(new FlowLayout());
 		sortPanel.add(sortLbl);
 		sortPanel.add(sortCb);
