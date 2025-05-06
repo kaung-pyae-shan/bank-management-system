@@ -3,6 +3,13 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -24,6 +31,8 @@ public class TransactionLogsPanel extends JPanel {
 	private TransactionController controller;
 	private DefaultTableModel tableModel;
 	private JTable table;
+	private List<TransactionDetail> allTransactions;
+
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,12 +48,57 @@ public class TransactionLogsPanel extends JPanel {
 		JPanel sortPanel = new JPanel(new FlowLayout());
 		sortPanel.add(sortLbl);
 		sortPanel.add(sortCb);
+		sortCb.addActionListener(e -> {
+		    String selected = (String) sortCb.getSelectedItem();
+		    List<TransactionDetail> transactions = controller.fetchAllTransactionDetails(loggedInStaffId, role);
 
-		JTextField searchField = new JTextField();
+		    // Sort based on selection
+		    if ("Oldest first".equals(selected)) {
+		        transactions.sort((t1, t2) -> t1.timestamp().compareTo(t2.timestamp()));
+		    } else {
+		        transactions.sort((t1, t2) -> t2.timestamp().compareTo(t1.timestamp())); // Newest first
+		    }
+
+		    refreshTable(transactions);
+		});
+
+		JTextField searchField = new JTextField("Search by Ref: No and Acc: No");
 		searchField.setPreferredSize(new Dimension(200, 20));
+		
+		searchField.addFocusListener(new java.awt.event.FocusAdapter() {
+		    @Override
+		    public void focusGained(java.awt.event.FocusEvent e) {
+		        if (searchField.getText().equals("Search by Ref: No and Acc: No")) {
+		            searchField.setText("");
+		        }
+		    }
+
+		    @Override
+		    public void focusLost(java.awt.event.FocusEvent e) {
+		        if (searchField.getText().isEmpty()) {
+		            searchField.setText("Search by Ref: No and Acc: No");
+		        }
+		    }
+		});
+
 
 		formFieldPanel.add(sortPanel, BorderLayout.WEST);
 		formFieldPanel.add(searchField, BorderLayout.EAST);
+		
+		searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+		    public void insertUpdate(javax.swing.event.DocumentEvent e) {
+		        filterTransactions(searchField.getText());
+		    }
+
+		    public void removeUpdate(javax.swing.event.DocumentEvent e) {
+		        filterTransactions(searchField.getText());
+		    }
+
+		    public void changedUpdate(javax.swing.event.DocumentEvent e) {
+		        filterTransactions(searchField.getText());
+		    }
+		});
+
 
 		initTable(loggedInStaffId, role);
 		refreshTable(controller.fetchAllTransactionDetails(loggedInStaffId, role));
@@ -92,4 +146,27 @@ public class TransactionLogsPanel extends JPanel {
 		}
 		tableModel.fireTableDataChanged();
 	}
+	
+	private void filterTransactions(String query) {
+	    if (query == null || query.trim().isEmpty()) {
+	        refreshTable(allTransactions);
+	        return;
+	    }
+
+	    String lowerQuery = query.trim().toLowerCase();
+
+	    List<TransactionDetail> filtered = new java.util.ArrayList<>();
+	    for (TransactionDetail trx : allTransactions) {
+	        String refNo = trx.referenceNo() != null ? trx.referenceNo().toLowerCase() : "";
+	        String fromAcc = trx.fromAccount() != null ? trx.fromAccount().toLowerCase() : "";
+	        String toAcc = trx.toAccount() != null ? trx.toAccount().toLowerCase() : "";
+
+	        if (refNo.contains(lowerQuery) || fromAcc.contains(lowerQuery) || toAcc.contains(lowerQuery)) {
+	            filtered.add(trx);
+	        }
+	    }
+
+	    refreshTable(filtered);
+	}
+
 }
