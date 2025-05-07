@@ -260,7 +260,9 @@ public class TransactionRepository {
 				LEFT JOIN
 				    accounts a2 ON t.to_account_id = a2.account_id
 				LEFT JOIN
-				    staffs s ON t.processed_by = s.staff_id;
+				    staffs s ON t.processed_by = s.staff_id
+				ORDER BY
+					transaction_date DESC;
 								""";
 		List<TransactionDetail> transactionDetails = new ArrayList<>();
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
@@ -303,7 +305,9 @@ public class TransactionRepository {
 				LEFT JOIN
 				    staffs s ON t.processed_by = s.staff_id
 				WHERE 
-					s.staff_id = ?;
+					s.staff_id = ?
+				ORDER BY
+					transaction_date DESC;
 								""";
 		List<TransactionDetail> transactionDetails = new ArrayList<>();
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {

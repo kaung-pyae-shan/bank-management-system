@@ -89,6 +89,7 @@ public class CustomerManagementPanel extends JPanel {
 	public CustomerManagementPanel(CustomerController controller, int loggedInStaffId) {
 		this.controller = controller;
 		setLayout(new BorderLayout(0, 20));
+		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 		// ==== Search bar panel ====
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

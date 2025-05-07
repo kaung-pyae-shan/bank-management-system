@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -48,6 +49,7 @@ public class CardManagement extends JPanel {
 	public CardManagement() {
 
 		setLayout(new BorderLayout(0, 20));
+		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 		// ==== Search bar panel ====
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

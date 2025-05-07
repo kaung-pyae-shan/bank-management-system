@@ -16,6 +16,7 @@ import java.awt.event.FocusEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -49,6 +50,7 @@ public class UserManagement extends JPanel {
 	public UserManagement() {
 
 		setLayout(new BorderLayout(0, 20));
+		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 		// ==== Search bar panel ====
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
