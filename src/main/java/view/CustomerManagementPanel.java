@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.time.Period;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -131,6 +132,39 @@ public class CustomerManagementPanel extends JPanel {
 		emailField = new JTextField(25);
 		phoneField = new JTextField(25);
 		addressField = new JTextField(25);
+		
+		nameField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyTyped(java.awt.event.KeyEvent e) {
+				char c = e.getKeyChar();
+
+				// Allow only letters (A-Z, a-z) and space
+				if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+					e.consume(); // block anything that's not a letter, space, or control character
+				}
+			}
+		});
+		phoneField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyTyped(java.awt.event.KeyEvent e) {
+				char c = e.getKeyChar();
+				String currentText = phoneField.getText();
+
+				// Allow backspace and delete
+				if (Character.isISOControl(c)) {
+					return;
+				}
+
+				// Only allow digits
+				if (!Character.isDigit(c)) {
+					e.consume();
+					return;
+				}
+
+				// Limit to 11 digits
+				if (currentText.length() >= 11) {
+					e.consume();
+				}
+			}
+		});
 
 		JPanel nrcInnerPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints innerGbc = new GridBagConstraints();
@@ -249,6 +283,28 @@ public class CustomerManagementPanel extends JPanel {
 				nrcType = selectedItem;
 			}
 		});
+		nrcNumberField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyTyped(java.awt.event.KeyEvent e) {
+				char c = e.getKeyChar();
+				String currentText = nrcNumberField.getText();
+
+				// Allow backspace and delete
+				if (Character.isISOControl(c)) {
+					return;
+				}
+
+				// Only allow digits
+				if (!Character.isDigit(c)) {
+					e.consume();
+					return;
+				}
+
+				// Limit to 11 digits
+				if (currentText.length() >= 6) {
+					e.consume();
+				}
+			}
+		});
 
 		// == Account Details Panel ==
 		cardLayout = new CardLayout();
@@ -280,18 +336,35 @@ public class CustomerManagementPanel extends JPanel {
 		refreshTable(controller.fetchCustomers());
 
 		datePicker.addPropertyChangeListener("date", new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				Date selectedDate = datePicker.getDate();
-				if (selectedDate != null) {
-					dob = selectedDate.toInstant()
-										.atZone(ZoneId.systemDefault())
-										.toLocalDate();
-				} else {
-					// user cleared the date, so clear our dob variable too
-					dob = null;
-				}
-			}
+		    @Override
+		    public void propertyChange(PropertyChangeEvent evt) {
+		        if ("date".equals(evt.getPropertyName())) {
+		            Date selectedDate = datePicker.getDate();
+		            if (selectedDate != null) {
+		                dob = selectedDate.toInstant()
+		                                  .atZone(ZoneId.systemDefault())
+		                                  .toLocalDate();
+
+		                // Check if the person is at least 18 years old
+		                if (dob != null && !isAdult(dob)) {
+		                    JOptionPane.showMessageDialog(null, "You must be at least 18 years old to proceed.", "Age Restriction", JOptionPane.WARNING_MESSAGE);
+		                    // Optionally, reset the date picker or handle accordingly
+		                    datePicker.setDate(null);
+		                    dob = null;
+		                }
+		            } else {
+		                // User cleared the date, so clear our dob variable too
+		                dob = null;
+		            }
+		        }
+		    }
+
+		    private boolean isAdult(LocalDate dob) {
+		        // Calculate the age from the date of birth
+		        LocalDate currentDate = LocalDate.now();
+		        int age = Period.between(dob, currentDate).getYears();
+		        return age >= 18;
+		    }
 		});
 		
 		searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -322,11 +395,19 @@ public class CustomerManagementPanel extends JPanel {
 		});
 		
 		btnSave.addActionListener(e -> {
+			 String email = emailField.getText();
+			    
+			    // Validate email format
+			    if (!isEmailFormat(email)) {
+			        JOptionPane.showMessageDialog(null, "Invalid email format. Please enter a valid email address.", 
+			                                      "Invalid Input", JOptionPane.ERROR_MESSAGE);
+			        return; // Stop further execution if the email format is invalid
+			    }
 			Customer customer = new Customer();
 			customer.setName(nameField.getText());
 			customer.setDob(dob);
 			customer.setNrc(stateCode + regionCode + "(" + nrcType + ")" + nrcNumberField.getText());
-			customer.setEmail(emailField.getText());
+			customer.setEmail(email);
 			customer.setPhone(phoneField.getText());
 			customer.setAddress(addressField.getText());
 			customer.setStaffId(loggedInStaffId);
@@ -337,18 +418,31 @@ public class CustomerManagementPanel extends JPanel {
 				clearForm();
 				cardLayout.show(accountPanel, "empty"); // switch back to the blank card
 				refreshTable(controller.fetchCustomers());
-			} else {
+			}else if (!isEmailFormat(email)) {
+				JOptionPane.showMessageDialog(this, "Invalid email format! Example: example@domain.com", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			} 
+			else {
 				JOptionPane.showMessageDialog(null,  "Failed to save new customer!!", "Failed", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 		
 		btnUpdate.addActionListener(e -> {
+			 String email = emailField.getText();
+			    
+			    // Validate email format
+			    if (!isEmailFormat(email)) {
+			        JOptionPane.showMessageDialog(null, "Invalid email format. Please enter a valid email address.", 
+			                                      "Invalid Input", JOptionPane.ERROR_MESSAGE);
+			        return; // Stop further execution if the email format is invalid
+			    }
 			Customer customer = new Customer();
 			customer.setId(selectedCustomerId);
 			customer.setName(nameField.getText());
 			customer.setDob(dob);
 			customer.setNrc(stateCode + regionCode + "(" + nrcType + ")" + nrcNumberField.getText());
-			customer.setEmail(emailField.getText());
+			customer.setEmail(email);
 			customer.setPhone(phoneField.getText());
 			customer.setAddress(addressField.getText());
 			customer.setStaffId(loggedInStaffId);
@@ -369,6 +463,21 @@ public class CustomerManagementPanel extends JPanel {
 			table.clearSelection(); // optional: un-highlight any selected row
 			cardLayout.show(accountPanel, "empty"); // switch back to the blank card
 		});
+	}
+	public static boolean isEmailFormat(String email) {
+		if (email == null || email.trim().isEmpty())
+			return false;
+
+		int at = email.indexOf("@");
+		int dot = email.lastIndexOf(".");
+
+		// Basic checks for position and presence
+		if (at < 1 || dot < at + 2 || dot + 2 >= email.length() || email.contains(" ")) {
+			return false;
+		}
+
+		String domainExtension = email.substring(dot + 1);
+		return domainExtension.equalsIgnoreCase("com");
 	}
 
 	private void initTable() {

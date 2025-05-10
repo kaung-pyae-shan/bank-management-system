@@ -34,7 +34,7 @@ import repository.CardRepository;
 public class CardManagement extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private JTextField txtSearch;
 	private JTextField txtAccountNumber;
 	private JTextField txtAccountHolder;
@@ -82,7 +82,7 @@ public class CardManagement extends JPanel {
 				searchCards(keyword);
 			}
 		});
-		
+
 		topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout(0, 20));
 
@@ -122,7 +122,7 @@ public class CardManagement extends JPanel {
 		// Form TextFields
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		lblCardNo = new JLabel("9879 1341 8651 8213");
+		lblCardNo = new JLabel(generateCardNumber());
 		formPanel.add(lblCardNo, gbc);
 		gbc.gridy = 1;
 		formPanel.add(txtAccountNumber, gbc);
@@ -137,7 +137,21 @@ public class CardManagement extends JPanel {
 		gbc.gridy = 6;
 		formPanel.add(cmbStatus, gbc);
 
+		txtAccountHolder.setEditable(false);
+		txtEmail.setEditable(false);
+		txtPhone.setEditable(false);
+
 		txtAccountNumber.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char c = e.getKeyChar();
+
+				// Allow only digits and control characters (backspace, delete, etc.)
+				if (!Character.isDigit(c) && c != ' ' && !Character.isISOControl(c)) {
+					e.consume(); // block the input
+				}
+			}
+
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -156,24 +170,30 @@ public class CardManagement extends JPanel {
 			String cardType = (String) cmbCardType.getSelectedItem();
 			String status = (String) cmbStatus.getSelectedItem();
 
-			if (accountNumber.isEmpty() || cardType.isEmpty()) {
+			if (accountNumber.isEmpty() || cardType.equals("Select type") || status.equals("Select status")) {
 				JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 						"Please fill in all required fields.");
 				return;
 			}
-
 			try {
-				int accountId = cardRepository.findAccountIdByAccountNumber(accountNumber);
-				if (accountId == 0) {
+				String accountType = cardRepository.getAccountTypeByAccountNumber(accountNumber);
+				if (accountType == null) {
 					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), "Account not found.");
 					return;
 				}
 
+				if (!accountType.equalsIgnoreCase("SAVING")) {
+					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
+							"Cards can only be issued for SAVING accounts.");
+					return;
+				}
+
+				int accountId = cardRepository.findAccountIdByAccountNumber(accountNumber);
 				boolean success = cardRepository.saveCard(accountId, cardNumber, cardType, status);
 				if (success) {
 					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), "Card saved successfully.");
 					loadCardsIntoTable();
-					lblCardNo.setText(generateCardNumber()); // generate new card number after save
+					lblCardNo.setText(generateCardNumber());
 				} else {
 					JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this), "Failed to save card.");
 				}
@@ -181,6 +201,11 @@ public class CardManagement extends JPanel {
 				ex.printStackTrace();
 				JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 						"An error occurred: " + ex.getMessage());
+			}
+			if (!cardRepository.canAddCard(accountNumber, cardType)) {
+				JOptionPane.showMessageDialog(null, "This account already has a " + cardType + " card.",
+						"Duplicate Card Type", JOptionPane.WARNING_MESSAGE);
+				return; // Stop further processing
 			}
 		});
 
@@ -205,7 +230,6 @@ public class CardManagement extends JPanel {
 
 		add(searchBarPanel, BorderLayout.NORTH);
 		add(topPanel, BorderLayout.CENTER);
-		
 
 		// ===================
 	}
@@ -299,12 +323,13 @@ public class CardManagement extends JPanel {
 		});
 		return button;
 	}
-	
+
 	private void initTable() {
-		String[] cols = { "Card Number", "Account Number", "Card Holder", "Email", "Phone", "Card Type",
-				"Issued Date", "Expiry Date", "Status" };
+		String[] cols = { "Card Number", "Account Number", "Card Holder", "Email", "Phone", "Card Type", "Issued Date",
+				"Expiry Date", "Status" };
 		tableModel = new DefaultTableModel(cols, 0) {
 			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean isCellEditable(int r, int c) {
 				return false;
@@ -313,7 +338,6 @@ public class CardManagement extends JPanel {
 		table = new JTable(tableModel);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setRowHeight(40);
-
 
 		JScrollPane tableScrollPane = new JScrollPane(table);
 //		tableScrollPane.setPreferredSize(new Dimension(700, 280)); // width, height
