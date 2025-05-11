@@ -1,24 +1,47 @@
 package view;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.math.BigDecimal;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
-import javax.swing.text.PlainDocument;
 
 import model.Account;
 import model.AccountType;
+import model.AccountType.OwnershipType;
+import model.AccountType.Type;
 import model.Staff;
 import repository.AccountRepository;
-import controller.CustomerController;
+import utils.AccountNumberGenerator;
 
 public class AccountManagementPanel extends JPanel {
 
@@ -42,7 +65,8 @@ public class AccountManagementPanel extends JPanel {
 	private JPanel customerFieldsPanel;
 	private int loggedInStaffId;
 
-	public AccountManagementPanel() {
+	public AccountManagementPanel(int loggedIntStaffId) {
+		this.loggedInStaffId = loggedIntStaffId;
 		setLayout(new BorderLayout(0, 20));
 		setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -110,6 +134,13 @@ public class AccountManagementPanel extends JPanel {
 				}
 			}
 		});
+		
+		ItemListener generateListener = e -> {
+            // Only react to selection events
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                generateAccountNumberIfReady();
+            }
+        };
 
 		JPanel ownerInnerPanel = new JPanel();
 		ownerInnerPanel.setLayout(new BoxLayout(ownerInnerPanel, BoxLayout.X_AXIS));
@@ -158,6 +189,9 @@ public class AccountManagementPanel extends JPanel {
 		accountTypeCb.addItem("FIXED_360D");
 		accountTypeCb.addItem("FIXED_720D");
 		accountTypeCb.addItem("FIXED_1080D");
+		
+		accountTypeCb.addItemListener(generateListener);
+		ownershipCb.addItemListener(generateListener);
 
 		statusCb = new JComboBox<>();
 		statusCb.addItem("Select Status");
@@ -183,7 +217,7 @@ public class AccountManagementPanel extends JPanel {
 
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		lblAccountNo = generateLabel("110100000011");
+		lblAccountNo = generateLabel("");
 		formPanel.add(lblAccountNo, gbc);
 		gbc.gridy = 1;
 		formPanel.add(accountTypeCb, gbc);
@@ -417,7 +451,7 @@ public class AccountManagementPanel extends JPanel {
 		
 		// Dummy staff for now — replace with logged-in staff
 		Staff dummyStaff = new Staff();
-		dummyStaff.setId(1);
+		dummyStaff.setId(loggedInStaffId);
 		account.setCreatedBy(dummyStaff);
 		
 		// Setup accountType
@@ -436,6 +470,21 @@ public class AccountManagementPanel extends JPanel {
 			JOptionPane.showMessageDialog(this, "Failed to save account.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	private void generateAccountNumberIfReady() {
+        Object accountTypeSelection = accountTypeCb.getSelectedItem();
+        Object ownershipTypeSelection = ownershipCb.getSelectedItem();
+        // Ensure both have valid selections (not the placeholder)
+        if (accountTypeSelection != null && ownershipTypeSelection != null &&
+            !"Select Type".equals(accountTypeSelection) && !"Select Ownership".equals(ownershipTypeSelection)) {
+            // Call your AccountNumberGenerator utility, for example:
+            String generatedAccountNumber = AccountNumberGenerator.generateNewAccountNumber(Type.valueOf(accountTypeSelection.toString()), OwnershipType.valueOf(ownershipTypeSelection.toString()));
+            lblAccountNo.setText(generatedAccountNumber);
+        } else {
+            // Clear account number if either selection is invalid
+            lblAccountNo.setText("");
+        }
+    }
 
 	// Method to return account_type_id based on the account type and ownership type
 	private int getAccountTypeId(String typeStr, String ownershipStr) {
