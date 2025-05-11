@@ -221,20 +221,19 @@ public class UserManagementPanel extends JPanel {
 
 	}
 
-	// Update Staff
 	private void updateStaff() {
 		if (selectedStaffId == -1) {
 			JOptionPane.showMessageDialog(this, "Please select a staff record to update.", "Error",
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+
 		String name = txtName.getText().trim();
-		String password = txtPassword.getText().trim();
 		String email = txtEmail.getText().trim();
 		String phone = txtPhone.getText().trim();
 		String role = (String) cmbRole.getSelectedItem();
 
-		if (name.isEmpty() || password.isEmpty() || email.isEmpty() || phone.isEmpty() || role.isEmpty()) {
+		if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || role.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "All fields must be filled!", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		} else if (!isEmailFormat(email)) {
@@ -242,11 +241,21 @@ public class UserManagementPanel extends JPanel {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		} else {
-			UserRepository.updateStaff(selectedStaffId, name, password, email, phone, role);
-			loadStaffData();
-			clearFields();
+			try {
+				boolean success = UserRepository.updateStaff(selectedStaffId, name, email, phone, role);
+				if (success) {
+					JOptionPane.showMessageDialog(this, "Staff updated successfully.", "Success",
+							JOptionPane.INFORMATION_MESSAGE);
+					loadStaffData();
+					clearFields();
+				} else {
+					JOptionPane.showMessageDialog(this, "Failed to update staff.", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			} catch (SQLException ex) {
+				JOptionPane.showMessageDialog(this, "Database error: " + ex.getMessage(), "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		}
-
 	}
 
 	// Load staff data
