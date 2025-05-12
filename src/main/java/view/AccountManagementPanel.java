@@ -279,7 +279,7 @@ public class AccountManagementPanel extends JPanel implements UpdateablePanel {
 		formLabel.setFont(new Font("Dialog", Font.BOLD, 13));
 		return formLabel;
 	}
-
+	
 	private void addCustomerIdField() {
 		JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel label = new JLabel("Customer ID:");

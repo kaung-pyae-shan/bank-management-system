@@ -77,6 +77,36 @@ public class WithdrawPanel extends JPanel {
 		currentBalanceField = new JTextField(25);
 		amountField = new JTextField(25);
 		
+		accNumberField.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
+			public void keyTyped(java.awt.event.KeyEvent evt) {
+				char c = evt.getKeyChar();
+				if (!(Character.isDigit(c) || c == '\b')) {
+					evt.consume(); // Only allow digits, and backspace
+				}
+				String currentText = accNumberField.getText();
+
+				if (currentText.length() >= 12) {
+					evt.consume(); // Block non-digit or too many digits
+				}
+			}
+		});
+		
+		amountField.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
+			public void keyTyped(java.awt.event.KeyEvent evt) {
+				char c = evt.getKeyChar();
+				if (!(Character.isDigit(c) || c == '.' || c == '\b')) {
+					evt.consume(); // Only allow digits, decimal point, and backspace
+				}
+
+				// Allow only one decimal point
+				if (c == '.' && amountField.getText().contains(".")) {
+					evt.consume();
+				}
+			}
+		});
+		
 		gbc.insets = new Insets(15, 10, 15, 10);
 
 		gbc.gridx = 1;

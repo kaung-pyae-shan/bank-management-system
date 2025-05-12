@@ -152,9 +152,17 @@ public class CardRepository {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				Object[] row = { rs.getString("card_number"), rs.getString("account_number"), rs.getString("name"),
-						rs.getString("email"), rs.getString("phone"), rs.getString("card_type"),
-						rs.getDate("issued_date"), rs.getDate("expiry_date"), rs.getString("status") };
+				Object[] row = {
+					rs.getString("card_number"),
+					rs.getString("account_number"),
+					rs.getString("name"),
+					rs.getString("email"),
+					rs.getString("phone"),
+					rs.getString("card_type"),
+					rs.getDate("issued_date"),
+					rs.getDate("expiry_date"),
+					rs.getString("status")
+				};
 				cards.add(row);
 			}
 

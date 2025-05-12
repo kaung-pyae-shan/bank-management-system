@@ -32,7 +32,7 @@ public class DepositPanel extends JPanel {
 	private JTextField cusSinceField;
 	private JTextField currentBalanceField;
 	private JTextField amountField;
-	
+
 	private DepositWithdrawForm form;
 	private int currentAccountId;
 
@@ -57,8 +57,8 @@ public class DepositPanel extends JPanel {
 			gbc.gridy = y;
 			JLabel formLabel = new JLabel(label + ":");
 			formLabel.setFont(new Font("Dialog", Font.BOLD, 13));
-	
-			if(label.equals("Deposit Amount")) {
+
+			if (label.equals("Deposit Amount")) {
 				gbc.insets = new Insets(30, 10, 13, 10);
 				add((formLabel), gbc);
 				continue;
@@ -66,7 +66,7 @@ public class DepositPanel extends JPanel {
 			add((formLabel), gbc);
 			y++;
 		}
-		
+
 		// init textfields
 		accNumberField = new JTextField(25);
 		accHolderField = new JTextField(25);
@@ -76,37 +76,65 @@ public class DepositPanel extends JPanel {
 		cusSinceField = new JTextField(25);
 		currentBalanceField = new JTextField(25);
 		amountField = new JTextField(25);
-		
+
+		accNumberField.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
+			public void keyTyped(java.awt.event.KeyEvent evt) {
+				char c = evt.getKeyChar();
+				if (!(Character.isDigit(c) || c == '\b')) {
+					evt.consume(); // Only allow digits, and backspace
+				}
+				String currentText = accNumberField.getText();
+
+				if (currentText.length() >= 12) {
+					evt.consume(); // Block non-digit or too many digits
+				}
+			}
+		});
+
+		amountField.addKeyListener(new java.awt.event.KeyAdapter() {
+			@Override
+			public void keyTyped(java.awt.event.KeyEvent evt) {
+				char c = evt.getKeyChar();
+				if (!(Character.isDigit(c) || c == '.' || c == '\b')) {
+					evt.consume(); // Only allow digits, decimal point, and backspace
+				}
+				if (c == '.' && amountField.getText().contains(".")) {
+					evt.consume();
+				}
+			}
+		});
+
 		gbc.insets = new Insets(15, 10, 15, 10);
 
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		add(accNumberField, gbc);
-		
+
 		gbc.gridy = 1;
 		accHolderField.setEditable(false);
 		add(accHolderField, gbc);
-		
+
 		gbc.gridy = 2;
 		emailField.setEditable(false);
 		add(emailField, gbc);
-		
+
 		gbc.gridy = 3;
 		phoneField.setEditable(false);
 		add(phoneField, gbc);
-		
+
 		gbc.gridy = 4;
 		addressField.setEditable(false);
 		add(addressField, gbc);
-		
+
 		gbc.gridy = 5;
 		cusSinceField.setEditable(false);
 		add(cusSinceField, gbc);
-		
+
 		gbc.gridy = 6;
 		currentBalanceField.setEditable(false);
 		add(currentBalanceField, gbc);
-		
+
 		gbc.gridy = 7;
 		gbc.insets = new Insets(35, 10, 10, 10);
 		add(amountField, gbc);
@@ -120,13 +148,13 @@ public class DepositPanel extends JPanel {
 		gbc.gridy++;
 		gbc.insets = new Insets(5, 10, 10, 10);
 		add(actionButton, gbc);
-		
+
 		accNumberField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String accountNumber = accNumberField.getText();
 				form = controller.fetchAccountAndCustomer(accountNumber);
-				if(null != form) {
+				if (null != form) {
 					accHolderField.setText(form.getAccountHolder());
 					emailField.setText(form.getEmail());
 					phoneField.setText(form.getPhone());
@@ -145,7 +173,7 @@ public class DepositPanel extends JPanel {
 				}
 			}
 		});
-		
+
 		actionButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -154,12 +182,13 @@ public class DepositPanel extends JPanel {
 					amount = new BigDecimal(amountField.getText());
 					int row = controller.depositBalance(amount, currentAccountId, loggedInStaffId);
 					if (row > 0) {
-						JOptionPane.showMessageDialog(null,  "Deposited successfully!!", "Success", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Deposited successfully!!", "Success",
+								JOptionPane.INFORMATION_MESSAGE);
 						form = controller.fetchAccountAndCustomer(accNumberField.getText());
 						currentBalanceField.setText(form.getCurrentBalance().toString());
 						amountField.setText("");
 					} else {
-						JOptionPane.showMessageDialog(null,  "Failed to deposit!!", "Failed", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Failed to deposit!!", "Failed", JOptionPane.ERROR_MESSAGE);
 					}
 				} catch (NumberFormatException e2) {
 					JOptionPane.showMessageDialog(null, "Enter valid input", "Error", JOptionPane.ERROR_MESSAGE);
