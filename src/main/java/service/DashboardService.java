@@ -6,6 +6,7 @@ import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
 import model.dto.RecentTransaction;
 import model.dto.TellerDashboardStats;
+import model.dto.TransactionDetail;
 import repository.AccountRepository;
 import repository.CardRepository;
 import repository.CustomerRepository;
@@ -45,11 +46,11 @@ public class DashboardService {
 				transactionRepo.countTodayTransactionsByStaffId(staffId));
 	}
 	
-	public List<RecentTransaction> getRecentTransactions() {
-		return transactionRepo.searchLast24HrTransactions();
+	public List<TransactionDetail> getRecentTransactions() {
+		return transactionRepo.findAllTransactionDetailsLast24Hour();
 	}
 	
-	public List<RecentTransaction> getRecentTransactions(int staffId) {
-		return transactionRepo.searchLast24HrTransactionsByStaffId(staffId);
+	public List<TransactionDetail> getRecentTransactions(int staffId) {
+		return transactionRepo.findTransactionDetailsByStaffIdLast24Hour(staffId);
 	}
 }

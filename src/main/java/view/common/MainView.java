@@ -44,11 +44,11 @@ public class MainView extends JFrame {
 
 		// 🔹 Init menu with listener
 		if(role == Role.ADMIN) {
-			AdminMenuPanel adminMenuPanel = new AdminMenuPanel(viewName -> showPanel(viewName));
+			AdminMenuPanel adminMenuPanel = new AdminMenuPanel(viewName -> showPanel(viewName), this);
 			contentPane.add(adminMenuPanel, BorderLayout.WEST);	
 			adminMenuPanel.setPreferredSize(new Dimension(300, 700));
 		} else if(role == Role.TELLER) {
-			TellerMenuPanel tellerMenuPanel = new TellerMenuPanel(viewName -> showPanel(viewName));
+			TellerMenuPanel tellerMenuPanel = new TellerMenuPanel(viewName -> showPanel(viewName), this);
 			contentPane.add(tellerMenuPanel, BorderLayout.WEST);	
 			tellerMenuPanel.setPreferredSize(new Dimension(300, 700));
 		}

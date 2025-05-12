@@ -6,6 +6,7 @@ import model.Transaction.TransactionStatus;
 import model.dto.AdminDashboardStats;
 import model.dto.RecentTransaction;
 import model.dto.TellerDashboardStats;
+import model.dto.TransactionDetail;
 import service.DashboardService;
 
 public class DashboardController {
@@ -32,11 +33,19 @@ public class DashboardController {
 		return service.getTellerDashboardStats(staffId);
 	}
 	
-	public List<RecentTransaction> fetchAdminDashboardTable() {
+//	public List<RecentTransaction> fetchAdminDashboardTable() {
+//		return service.getRecentTransactions();
+//	}
+	
+	public List<TransactionDetail> fetchAdminDashboardTable() {
 		return service.getRecentTransactions();
 	}
 	
-	public List<RecentTransaction> fetchTellerDashboardTable(int staffId) {
+//	public List<RecentTransaction> fetchTellerDashboardTable(int staffId) {
+//		return service.getRecentTransactions(staffId);
+//	}
+	
+	public List<TransactionDetail> fetchTellerDashboardTable(int staffId) {
 		return service.getRecentTransactions(staffId);
 	}
 }

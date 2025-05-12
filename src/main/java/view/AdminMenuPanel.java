@@ -1,6 +1,10 @@
 package view;
 
 import javax.swing.*;
+
+import config.DependenciesConfig;
+import view.common.MainView;
+
 import java.awt.*;
 import java.util.function.Consumer;
 
@@ -9,7 +13,7 @@ public class AdminMenuPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JButton selectedButton; // Field to keep track of the selected button
 
-	public AdminMenuPanel(Consumer<String> navCallback) {
+	public AdminMenuPanel(Consumer<String> navCallback, MainView mainView) {
 		setBackground(new Color(0x353535));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setPreferredSize(new Dimension(300, 700));
@@ -51,7 +55,7 @@ public class AdminMenuPanel extends JPanel {
 		add(Box.createVerticalGlue());
 
 		// Logout button at the bottom
-		addNavButton("Logout", action -> showLogoutConfirmation("Logout"));
+		addNavButton("Logout", action -> logout(mainView));
 
 		add(Box.createVerticalStrut(20)); // bottom padding
 		
@@ -103,20 +107,9 @@ public class AdminMenuPanel extends JPanel {
 		return button;
 	}
 	
-	private void showLogoutConfirmation(String action) {
-        int response = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to logout?", 
-            "Confirm Logout", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE);
-
-        if (response == JOptionPane.YES_OPTION) {
-            // Proceed with logout
-            System.out.println("User  logged out.");
-            // Add your logout logic here
-        } else {
-            // Cancel logout
-            System.out.println("Logout canceled.");
-        }
+	private void logout(MainView mainView) {
+		Login login = new Login(new DependenciesConfig().getLoginController());
+		login.setVisible(true);
+		mainView.dispose();
     }
 }

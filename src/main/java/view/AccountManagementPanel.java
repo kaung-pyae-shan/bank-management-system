@@ -42,8 +42,9 @@ import model.AccountType.Type;
 import model.Staff;
 import repository.AccountRepository;
 import utils.AccountNumberGenerator;
+import utils.UpdateablePanel;
 
-public class AccountManagementPanel extends JPanel {
+public class AccountManagementPanel extends JPanel implements UpdateablePanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -681,5 +682,10 @@ public class AccountManagementPanel extends JPanel {
 					accountRepository.countCustomersByAccount(account.getId()), account.getStatus() };
 			tableModel.addRow(row);
 		}
+	}
+
+	@Override
+	public void updateData() {
+		refreshTable();	
 	}
 }

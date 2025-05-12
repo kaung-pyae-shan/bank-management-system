@@ -32,4 +32,8 @@ public class InterestController {
 	public int updateInterestToAllActiveSaving(int processedBy) {
 		return service.calculateInterestForAllSaving(processedBy);
 	}
+	
+	public void updateInterestToAllFixed() {
+		service.calculateInterestForAllFixed();
+	}
 }

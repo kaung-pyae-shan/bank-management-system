@@ -5,6 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +16,7 @@ import model.Account;
 import model.AccountType;
 import model.AccountType.Type;
 import model.dto.DepositWithdrawForm;
+import model.dto.FixedDetail;
 
 public class AccountRepository {
 
@@ -366,4 +370,32 @@ public class AccountRepository {
 	    return -1;
 	}
 
+	public List<FixedDetail> getAllFixedAccountDetail() {
+		String sql = """
+				SELECT a.account_id, a.balance, at.account_type, a.created_at, air.interest_rate, air.duration_days
+				FROM accounts a
+				JOIN account_types at ON a.account_type_id = at.account_type_id
+				JOIN account_interest_rates air ON a.account_type_id = air.account_type_id
+				WHERE at.account_type LIKE 'FIXED_%';
+				""";
+		List<FixedDetail> details = new ArrayList<>();
+		
+		try(var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			var rs = stmt.executeQuery();
+			while(rs.next()) {
+				int accountId = rs.getInt("account_id");
+				BigDecimal balance = rs.getBigDecimal("balance");
+				Type accountType = Type.valueOf(rs.getString("account_type"));
+				Timestamp createdAt = rs.getTimestamp("created_at");
+				BigDecimal percentPerAnnum = rs.getBigDecimal("interest_rate");
+				int duration = rs.getInt("duration_days");
+				LocalDate dueDate = createdAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(duration);
+				FixedDetail detail = new FixedDetail(accountId, balance, accountType, dueDate, percentPerAnnum, duration);
+				details.add(detail);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return details;
+	}
 }

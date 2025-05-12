@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -86,16 +87,19 @@ public class InterestManagementPanel extends JPanel {
 
 		btnUpdate.addActionListener(e -> {
 			String input = cmbAccTypeSetting.getSelectedItem().toString();
-			
+
 			BigDecimal rate = BigDecimal.valueOf(Double.parseDouble(interestRateField.getText()));
 			if (controller.isSameInterestRate(Type.valueOf(input), rate)) {
-				JOptionPane.showMessageDialog(null, "The interest rate for " + input + " account is already set to the same value.", "Success", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"The interest rate for " + input + " account is already set to the same value.", "Success",
+						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			int row = controller.changeInterestRate(Type.valueOf(input), rate);
-			if(row > 0) {
+			if (row > 0) {
 				interestRateField.setText(controller.findInterestRate(Type.valueOf(input)).toString());
-				JOptionPane.showMessageDialog(null, "Interest rate for " + input + " account type changed successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Interest rate for " + input + " account type changed successfully",
+						"Success", JOptionPane.INFORMATION_MESSAGE);
 			}
 
 		});
@@ -125,9 +129,7 @@ public class InterestManagementPanel extends JPanel {
 		gbc.gridy++;
 		applyInterestPanel.add(generateLabel("Interest rate per annum"), gbc);
 
-
-		JComboBox<String> cmbAccTypeApply = new JComboBox<>(new String[] { "Select type", "SAVING", "FIXED_90D",
-				"FIXED_180D", "FIXED_360D", "FIXED_720D", "FIXED_1080D" });
+		JComboBox<String> cmbAccTypeApply = new JComboBox<>(new String[] { "Select type", "SAVING" });
 		JTextField numberOfAccountsField = new JTextField(25);
 		numberOfAccountsField.setEditable(false);
 		JTextField applyInterestRateField = new JTextField(25);
@@ -140,7 +142,24 @@ public class InterestManagementPanel extends JPanel {
 		applyInterestPanel.add(numberOfAccountsField, gbc);
 		gbc.gridy++;
 		applyInterestPanel.add(applyInterestRateField, gbc);
-		
+
+		// Action Buttons
+		JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+		JButton btnApply = addActionButton("Apply", new Color(0x353535));
+		btnApply.setEnabled(false);
+		;
+		buttonPanel1.add(btnApply);
+		gbc.gridy++;
+		applyInterestPanel.add(buttonPanel1, gbc);
+
+		btnApply.addActionListener(e -> {
+			int row = controller.updateInterestToAllActiveSaving(loggedInStaffId);
+			if (row > 0) {
+				JOptionPane.showMessageDialog(null, "Applied interest to " + row + " savings account successfully!",
+						"Success", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+
 		cmbAccTypeApply.addActionListener(e -> {
 			String input = cmbAccTypeApply.getSelectedItem().toString();
 
@@ -150,19 +169,12 @@ public class InterestManagementPanel extends JPanel {
 			}
 			numberOfAccountsField.setText(String.valueOf(controller.findSavingCount()));
 			applyInterestRateField.setText(controller.findInterestRate(Type.valueOf(input)).toString());
+			if(isFirstDayOfMonth()) {
+				btnApply.setEnabled(true);
+			}
 		});
 		
-
-		// Action Buttons
-		JPanel buttonPanel1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-		JButton btnApply = addActionButton("Apply", new Color(0x353535));
-		buttonPanel1.add(btnApply);
-		gbc.gridy++;
-		applyInterestPanel.add(buttonPanel1, gbc);
-		
-		btnApply.addActionListener(e -> {
-			controller.updateInterestToAllActiveSaving(loggedInStaffId);
-		});
+		controller.updateInterestToAllFixed();
 
 		applyInterestPanel.setBorder(new MatteBorder(2, 0, 0, 0, Color.GRAY));
 		add(interestSettingPanel);
@@ -201,4 +213,9 @@ public class InterestManagementPanel extends JPanel {
 		});
 		return button;
 	}
+	
+	private boolean isFirstDayOfMonth() {
+        LocalDate today = LocalDate.now(); // Get the current date
+        return today.getDayOfMonth() == 1; // Check if it's the first day of the month
+    }
 }

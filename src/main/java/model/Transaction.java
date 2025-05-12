@@ -17,7 +17,7 @@ public class Transaction {
 	private Staff handledBy;
 
 	public enum TransactionType {
-		DEPOSIT, WITHDRAW, TRANSFER, INTEREST
+		DEPOSIT, WITHDRAW, TRANSFER, INTEREST, INITIAL
 	}
 
 	public enum TransactionStatus {

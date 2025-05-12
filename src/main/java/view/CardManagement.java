@@ -188,6 +188,11 @@ public class CardManagement extends JPanel {
 					return;
 				}
 
+				if (!cardRepository.canAddCard(accountNumber, cardType)) {
+					JOptionPane.showMessageDialog(null, "This account already has a " + cardType + " card.",
+							"Duplicate Card Type", JOptionPane.WARNING_MESSAGE);
+					return; // Stop further processing
+				}
 				int accountId = cardRepository.findAccountIdByAccountNumber(accountNumber);
 				boolean success = cardRepository.saveCard(accountId, cardNumber, cardType, status);
 				if (success) {
@@ -202,11 +207,11 @@ public class CardManagement extends JPanel {
 				JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 						"An error occurred: " + ex.getMessage());
 			}
-			if (!cardRepository.canAddCard(accountNumber, cardType)) {
-				JOptionPane.showMessageDialog(null, "This account already has a " + cardType + " card.",
-						"Duplicate Card Type", JOptionPane.WARNING_MESSAGE);
-				return; // Stop further processing
-			}
+//			if (!cardRepository.canAddCard(accountNumber, cardType)) {
+//				JOptionPane.showMessageDialog(null, "This account already has a " + cardType + " card.",
+//						"Duplicate Card Type", JOptionPane.WARNING_MESSAGE);
+//				return; // Stop further processing
+//			}
 		});
 
 		JButton btnClear = addActionButton("Clear", new Color(0x353535));

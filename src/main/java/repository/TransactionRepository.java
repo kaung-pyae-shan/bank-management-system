@@ -3,11 +3,13 @@ package repository;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import config.DatabaseConfig;
+import model.Account.AccountStatus;
 import model.Transaction.TransactionStatus;
 import model.Transaction.TransactionType;
 import model.dto.RecentTransaction;
@@ -22,18 +24,28 @@ public class TransactionRepository {
 		this.rnGenerator = rnGenerator;
 	}
 
-	public long countPendingTransactions() {
-		final String sql = "SELECT COUNT(*) FROM transactions where status = 'PENDING'";
+	public long countInerestTransactionsById(AccountStatus status, int accountId) {
+		final String sql = """
+				SELECT COUNT(*) FROM transactions t
+				JOIN accounts a on a.account_id = t.to_account_id
+				JOIN account_types at on a.account_type_id = at.account_type_id
+				WHERE
+				transaction_type = 'INTEREST' AND
+				at.account_type LIKE 'FIXED%' and
+				a.status = ? AND
+				t.to_account_id = ?
+				""";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setString(1, status.toString());
+			stmt.setInt(2, accountId);
 			var rs = stmt.executeQuery();
 			if (rs.next()) {
-				System.out.println(rs.getLong(1));
 				return rs.getLong(1);
 			}
 		} catch (Exception e) {
-			System.out.println("Failed to fetch Pending transactions count");
+			System.out.println("Failed to fetch Fixed Interest transactions count");
 		}
-		return 0L;
+		return 0;
 	}
 
 	public int updateTransactionStatus(int trxId, TransactionStatus status) {
@@ -192,7 +204,11 @@ public class TransactionRepository {
 			stmt.setString(2, type.toString());
 			stmt.setBigDecimal(3, amount);
 			stmt.setString(4, rnGenerator.generateNewReferenceNumber());
-			stmt.setInt(5, processedBy);
+			if(processedBy == 0) {
+				stmt.setNull(5, Types.INTEGER);
+			} else {
+				stmt.setInt(5, processedBy);				
+			}
 			int row = stmt.executeUpdate();
 			return row;
 		} catch (Exception e) {
@@ -242,6 +258,98 @@ public class TransactionRepository {
 		}
 		return 0;
 	}
+	
+	public List<TransactionDetail> findAllTransactionDetailsLast24Hour() {
+		final String sql = """
+				SELECT
+				    t.reference_number,
+				    t.transaction_date,
+				    t.transaction_type,
+				    t.amount,
+				    a1.account_number AS from_account_number,
+				    a2.account_number AS to_account_number,
+				    s.username,
+				    t.processed_by
+				FROM
+				    transactions t
+				LEFT JOIN
+				    accounts a1 ON t.from_account_id = a1.account_id
+				LEFT JOIN
+				    accounts a2 ON t.to_account_id = a2.account_id
+				LEFT JOIN
+				    staffs s ON t.processed_by = s.staff_id
+				WHERE
+					transaction_date >= NOW() - INTERVAL 24 HOUR
+				ORDER BY
+					transaction_date DESC;
+								""";
+		List<TransactionDetail> transactionDetails = new ArrayList<>();
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			var rs = stmt.executeQuery();
+			while(rs.next()) {
+				String processedBy = rs.getString("username") == null ? "System" : rs.getString("username") + " (ID: " + rs.getInt("processed_by") + ")";
+				TransactionDetail detail = new TransactionDetail(
+											rs.getString("reference_number"), 
+											rs.getTimestamp("transaction_date").toLocalDateTime(),
+											TransactionType.valueOf(rs.getString("transaction_type")),
+											rs.getBigDecimal("amount"),
+											rs.getString("from_account_number"),
+											rs.getString("to_account_number"),
+											processedBy);
+				transactionDetails.add(detail);
+			}
+			return transactionDetails;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return transactionDetails;
+	}
+	
+	public List<TransactionDetail> findTransactionDetailsByStaffIdLast24Hour(int loggedInStaffId) {
+		final String sql = """
+				SELECT
+				    t.reference_number,
+				    t.transaction_date,
+				    t.transaction_type,
+				    t.amount,
+				    a1.account_number AS from_account_number,
+				    a2.account_number AS to_account_number,
+				    s.username,
+				    t.processed_by
+				FROM
+				    transactions t
+				LEFT JOIN
+				    accounts a1 ON t.from_account_id = a1.account_id
+				LEFT JOIN
+				    accounts a2 ON t.to_account_id = a2.account_id
+				LEFT JOIN
+				    staffs s ON t.processed_by = s.staff_id
+				WHERE 
+					transaction_date >= NOW() - INTERVAL 24 HOUR and t.processed_by = ?
+				ORDER BY
+					transaction_date DESC;
+								""";
+		List<TransactionDetail> transactionDetails = new ArrayList<>();
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, loggedInStaffId);
+			var rs = stmt.executeQuery();
+			while(rs.next()) {
+				TransactionDetail detail = new TransactionDetail(
+											rs.getString("reference_number"), 
+											rs.getTimestamp("transaction_date").toLocalDateTime(),
+											TransactionType.valueOf(rs.getString("transaction_type")),
+											rs.getBigDecimal("amount"),
+											rs.getString("from_account_number"),
+											rs.getString("to_account_number"),
+											rs.getString("username") + " (ID: " + rs.getInt("processed_by") + ")");
+				transactionDetails.add(detail);
+			}
+			return transactionDetails;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return transactionDetails;
+	}
 
 	public List<TransactionDetail> findAllTransactionDetails() {
 		final String sql = """
@@ -269,6 +377,7 @@ public class TransactionRepository {
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			var rs = stmt.executeQuery();
 			while(rs.next()) {
+				String processedBy = rs.getString("username") == null ? "System" : rs.getString("username") + " (ID: " + rs.getInt("processed_by") + ")";
 				TransactionDetail detail = new TransactionDetail(
 											rs.getString("reference_number"), 
 											rs.getTimestamp("transaction_date").toLocalDateTime(),
@@ -276,14 +385,14 @@ public class TransactionRepository {
 											rs.getBigDecimal("amount"),
 											rs.getString("from_account_number"),
 											rs.getString("to_account_number"),
-											rs.getString("username") + " (ID: " + rs.getInt("processed_by") + ")");
+											processedBy);
 				transactionDetails.add(detail);
 			}
 			return transactionDetails;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return transactionDetails;
 	}
 
 	public List<TransactionDetail> findTransactionDetailsByStaffId(int loggedInStaffId) {
@@ -329,14 +438,15 @@ public class TransactionRepository {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return transactionDetails;
 	}
 	
 	public BigDecimal getDepositsDay1To5(int accountId, LocalDateTime from, LocalDateTime to) {
 	    String sql = """
 	        SELECT COALESCE(SUM(amount), 0) AS D1_5Deposit
 	        FROM transactions
-	        WHERE transaction_type = 'DEPOSIT' AND to_account_id = ? 
+	        WHERE transaction_type IN ('DEPOSIT', 'INITIAL')
+	        AND to_account_id = ? 
 	        AND transaction_date BETWEEN ? AND ?
 	    """;
 	    
@@ -364,7 +474,7 @@ public class TransactionRepository {
 				WHERE 
 					t.transaction_type = 'WITHDRAW'
 					AND t.from_account_id = ?
-					AND MONTH(t.transaction_date) = MONTH(CURRENT_DATE())
+					AND MONTH(t.transaction_date) = MONTH(CURRENT_DATE() - INTERVAL 1 MONTH)
 					AND YEAR(t.transaction_date) = YEAR(CURRENT_DATE());
 				""";
 		try(var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {

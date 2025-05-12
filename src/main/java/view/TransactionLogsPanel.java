@@ -3,6 +3,8 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import controller.TransactionController;
@@ -124,6 +128,37 @@ public class TransactionLogsPanel extends JPanel implements UpdateablePanel {
 		table = new JTable(tableModel);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setRowHeight(40);
+		
+		// Create a number formatter with comma grouping
+        NumberFormat currencyFormat = NumberFormat.getNumberInstance();
+        currencyFormat.setMinimumFractionDigits(2);
+        currencyFormat.setMaximumFractionDigits(2);
+        // Custom renderer for financial values with comma formatting
+        DefaultTableCellRenderer financialRenderer = new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+            public void setValue(Object value) {
+                if (value instanceof BigDecimal) {
+                    value = currencyFormat.format(((BigDecimal) value).doubleValue());
+                }
+                super.setValue(value);
+            }
+        };
+        financialRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(3).setCellRenderer(financialRenderer);
+        table.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+        table.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
+        if(role == Role.ADMIN) {
+        	table.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
+        }
 
 		JScrollPane tableScrollPane = new JScrollPane(table);
 		tableScrollPane.setPreferredSize(new Dimension(700, 280)); // width, height
@@ -149,7 +184,7 @@ public class TransactionLogsPanel extends JPanel implements UpdateablePanel {
 	}
 	
 	private List<TransactionDetail> filterTransactions(String query) {
-	    if (query == null || query.trim().isEmpty() || query.equals("")) {
+	    if (query == null || query.trim().isEmpty() || query.equals("") || query.equals("Search by Ref No, Acc No")) {
 	        return controller.fetchAllTransactionDetails(loggedInStaffId, role);
 	    }
 

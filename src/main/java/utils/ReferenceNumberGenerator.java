@@ -40,7 +40,7 @@ public class ReferenceNumberGenerator {
 	}
 
 	private String getLastReferenceNumber() {
-		String query = "SELECT reference_number FROM transactions WHERE transaction_date <= NOW() ORDER BY transaction_date DESC LIMIT 1";
+		String query = "SELECT reference_number FROM transactions WHERE transaction_date <= NOW() ORDER BY reference_number DESC LIMIT 1";
 		try (var con = DatabaseConfig.getConnection();
 				var stmt = con.prepareStatement(query);
 				ResultSet rs = stmt.executeQuery()) {
