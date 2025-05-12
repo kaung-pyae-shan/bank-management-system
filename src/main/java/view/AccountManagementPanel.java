@@ -75,13 +75,13 @@ public class AccountManagementPanel extends JPanel implements UpdateablePanel {
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		searchBarPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		JTextField searchField = new JTextField(20);
-		searchField.setText("Search by AccNo");
+		searchField.setText("Search by Account Number");
 		searchField.setForeground(Color.GRAY);
 		searchBarPanel.add(searchField);
 		searchField.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (searchField.getText().equals("Search by AccNo")) {
+				if (searchField.getText().equals("Search by Account Number")) {
 					searchField.setText("");
 					searchField.setForeground(Color.BLACK);
 				}
@@ -430,6 +430,21 @@ public class AccountManagementPanel extends JPanel implements UpdateablePanel {
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		if ("JOINT".equalsIgnoreCase(ownershipStr) && customerIds.size() < 2) {
+			JOptionPane.showMessageDialog(this, "Joint accounts must have at least two Customer IDs.", "Validation Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		// Check minimum balance based on Account Type
+		if ("Saving".equalsIgnoreCase(typeStr) && balance.compareTo(BigDecimal.valueOf(1000)) < 0) {
+			JOptionPane.showMessageDialog(this, "Minimum balance for Saving accounts is 1000.", "Validation Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		} else if (!"Saving".equalsIgnoreCase(typeStr) && balance.compareTo(BigDecimal.valueOf(10000)) < 0) {
+			JOptionPane.showMessageDialog(this, "Minimum balance for Fixed accounts is 10000.", "Validation Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 
 		// Determine account_type_id based on the combination of account type and
 		// ownership type
@@ -441,7 +456,6 @@ public class AccountManagementPanel extends JPanel implements UpdateablePanel {
 			return;
 		}
 		
-
 		// Build Account object
 		Account account = new Account();
 		account.setAccountNumber(lblAccountNo.getText().trim());

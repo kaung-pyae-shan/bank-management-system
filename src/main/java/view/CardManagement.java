@@ -55,12 +55,12 @@ public class CardManagement extends JPanel {
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		searchBarPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		txtSearch = new JTextField(20);
-		txtSearch.setText("Search");
+		txtSearch.setText("Search by Card Number");
 		searchBarPanel.add(txtSearch);
 		txtSearch.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (txtSearch.getText().equals("Search")) {
+				if (txtSearch.getText().equals("Search by Card Number")) {
 					txtSearch.setText("");
 					txtSearch.setForeground(Color.BLACK);
 				}
@@ -70,7 +70,7 @@ public class CardManagement extends JPanel {
 			public void focusLost(FocusEvent e) {
 				if (txtSearch.getText().isEmpty()) {
 					txtSearch.setForeground(Color.GRAY);
-					txtSearch.setText("Search");
+					txtSearch.setText("Search by Card Number");
 				}
 			}
 		});
@@ -222,6 +222,7 @@ public class CardManagement extends JPanel {
 			txtPhone.setText("");
 			cmbCardType.setSelectedIndex(0);
 			cmbStatus.setSelectedIndex(0);
+			txtSearch.setText("Search by Card Number");
 		});
 
 		buttonPanel.add(btnSave);

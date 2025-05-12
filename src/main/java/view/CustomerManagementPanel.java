@@ -96,12 +96,12 @@ public class CustomerManagementPanel extends JPanel {
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		searchBarPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		JTextField searchField = new JTextField(20);
-		searchField.setText("Search by NRC");
+		searchField.setText("Search by CustomerID and NRC");
 		searchBarPanel.add(searchField);
 		searchField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (searchField.getText().equals("Search by NRC")) {
+                if (searchField.getText().equals("Search by CustomerID and NRC")) {
                 	searchField.setText("");
                 	searchField.setForeground(Color.BLACK);
                 }
@@ -111,7 +111,7 @@ public class CustomerManagementPanel extends JPanel {
             public void focusLost(FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
                 	searchField.setForeground(Color.GRAY);
-                	searchField.setText("Search by NRC");
+                	searchField.setText("Search by CustomerID and NRC");
                 }
             }
         });
@@ -383,9 +383,8 @@ public class CustomerManagementPanel extends JPanel {
 			public void changedUpdate(DocumentEvent e) {
 				searchData(searchField.getText());
 			}
-			
 			private void searchData(String nrc) {
-				if(nrc.isBlank() || nrc.equals("Search by NRC")) {
+				if(nrc.isBlank() || nrc.equals("Search by CustomerID and NRC")) {
 					refreshTable(controller.fetchCustomers());
 				} else {
 					Customer customer = controller.fetchCustomerByNrc(nrc);
@@ -393,7 +392,7 @@ public class CustomerManagementPanel extends JPanel {
 				}
 			}
 		});
-		
+
 		btnSave.addActionListener(e -> {
 			 String email = emailField.getText();
 			    
@@ -481,7 +480,7 @@ public class CustomerManagementPanel extends JPanel {
 	}
 
 	private void initTable() {
-		String[] cols = { "Name", "NRC", "DOB", "Email", "Phone", "Address", "Since" };
+		String[] cols = { "CustomerID", "Name", "NRC", "DOB", "Email", "Phone", "Address", "Since" };
 		tableModel = new DefaultTableModel(cols, 0) {
 			private static final long serialVersionUID = 1L;
 			@Override
@@ -529,7 +528,7 @@ public class CustomerManagementPanel extends JPanel {
 		customers = customerlist;
 		tableModel.setRowCount(0);
 		for (Customer c : customers) {
-			tableModel.addRow(new Object[] { c.getName(), c.getNrc(), c.getDob(), c.getEmail(), c.getPhone(),
+			tableModel.addRow(new Object[] {c.getId(), c.getName(), c.getNrc(), c.getDob(), c.getEmail(), c.getPhone(),
 					c.getAddress(), c.getCreatedAt() });
 		}
 		tableModel.fireTableDataChanged();

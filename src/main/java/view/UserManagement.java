@@ -56,19 +56,19 @@ public class UserManagement extends JPanel {
 		JPanel searchBarPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		searchBarPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 		txtSearch = new JTextField(20);
-		txtSearch.setText("Search by Name");
+		txtSearch.setText("Search by keyword");
 		searchBarPanel.add(txtSearch);
 
 		txtSearch.addFocusListener(new FocusAdapter() {
 		    public void focusGained(FocusEvent e) {
-		        if (txtSearch.getText().equals("Search by Name")) {
+		        if (txtSearch.getText().equals("Search by keyword")) {
 		            txtSearch.setText("");
 		            txtSearch.setForeground(Color.BLACK);
 		        }
 		    }
 
 		    public void focusLost(FocusEvent e) {
-		        if (txtSearch.getText().isEmpty()) {
+		        if (txtSearch.getText().trim().isEmpty()) {
 		            txtSearch.setForeground(Color.GRAY);
 		            txtSearch.setText("Search by Name");
 		            loadStaffData();
@@ -263,7 +263,6 @@ public class UserManagement extends JPanel {
 	    }
 	}
 
-
 	private void loadStaffData() {
 	    tableModel.setRowCount(0);
 	    try (ResultSet rs = UserRepository.getAllStaff()) {
@@ -289,9 +288,9 @@ public class UserManagement extends JPanel {
 	    txtPhone.setText("");
 	    cmbRole.setSelectedIndex(0);
 	    selectedStaffId = -1;
-	    table.clearSelection();
+	    txtSearch.setText("Search by keyword");
+	    loadStaffData();
 	}
-
 
 	public static boolean isEmailFormat(String email) {
 		if (email == null || email.trim().isEmpty())

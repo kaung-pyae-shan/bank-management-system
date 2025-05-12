@@ -135,7 +135,7 @@ public class AccountRepository {
 		}
 		return new BigDecimal(0);
 	}
-	
+
 	public int setPreviousMonthBalance(int accountId) {
 		String sql = "UPDATE accounts SET previous_month_balance = balance WHERE account_id = ?";
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
@@ -154,7 +154,7 @@ public class AccountRepository {
 				JOIN account_types at ON a.account_type_id = at.account_type_id
 				WHERE at.account_type = 'SAVING' AND a.status = 'ACTIVE';
 				""";
-		
+
 		List<Integer> idList = new ArrayList<>();
 		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			var rs = stmt.executeQuery();
@@ -167,8 +167,6 @@ public class AccountRepository {
 		}
 		return idList;
 	}
-	
-	
 
 	public int insertAccount(Account account, List<Integer> customerIds) {
 		final String accountSql = "INSERT INTO accounts (account_type_id, account_number, balance, status, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?)";
@@ -286,23 +284,23 @@ public class AccountRepository {
 		}
 		return 0;
 	}
-	
-	public List<Integer> getCustomerIdsByAccountNumber(String accNumber) {
-	    List<Integer> customerIds = new ArrayList<>();
-	    String sql = "SELECT customer_id FROM customer_accounts WHERE account_id = (SELECT account_id FROM accounts WHERE account_number = ?)";
 
-	    try (Connection conn = DatabaseConfig.getConnection();
-	         PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        stmt.setString(1, accNumber);
-	        ResultSet rs = stmt.executeQuery();
-	        while (rs.next()) {
-	            customerIds.add(rs.getInt("customer_id"));
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	    return customerIds;
+	public List<Integer> getCustomerIdsByAccountNumber(String accNumber) {
+		List<Integer> customerIds = new ArrayList<>();
+		String sql = "SELECT customer_id FROM customer_accounts WHERE account_id = (SELECT account_id FROM accounts WHERE account_number = ?)";
+
+		try (Connection conn = DatabaseConfig.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setString(1, accNumber);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				customerIds.add(rs.getInt("customer_id"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return customerIds;
 	}
+
 	public boolean updateAccount(Account account, List<Integer> customerIds) {
 	    String updateAccountSql = """
 	        UPDATE accounts 
@@ -310,64 +308,63 @@ public class AccountRepository {
 	        WHERE account_number = ?
 	    """;
 
-	    String deleteCustomerMapSql = "DELETE FROM customer_accounts WHERE account_id = ?";
-	    String insertCustomerMapSql = "INSERT INTO customer_accounts (account_id, customer_id) VALUES (?, ?)";
+		String deleteCustomerMapSql = "DELETE FROM customer_accounts WHERE account_id = ?";
+		String insertCustomerMapSql = "INSERT INTO customer_accounts (account_id, customer_id) VALUES (?, ?)";
 
-	    try (Connection conn = DatabaseConfig.getConnection()) {
-	        conn.setAutoCommit(false);
+		try (Connection conn = DatabaseConfig.getConnection()) {
+			conn.setAutoCommit(false);
 
-	        // Get the account ID first
-	        int accountId = getAccountIdByAccountNumber(account.getAccountNumber(), conn);
-	        if (accountId == -1) {
-	            return false;
-	        }
+			// Get the account ID first
+			int accountId = getAccountIdByAccountNumber(account.getAccountNumber(), conn);
+			if (accountId == -1) {
+				return false;
+			}
 
-	        // Update account table
-	        try (PreparedStatement stmt = conn.prepareStatement(updateAccountSql)) {
-	            stmt.setBigDecimal(1, account.getBalance());
-	            stmt.setString(2, account.getStatus().name());
-	            stmt.setInt(3, account.getAccountType().getId());
-	            stmt.setString(4, account.getAccountNumber());
-	            stmt.executeUpdate();
-	        }
+			// Update account table
+			try (PreparedStatement stmt = conn.prepareStatement(updateAccountSql)) {
+				stmt.setBigDecimal(1, account.getBalance());
+				stmt.setString(2, account.getStatus().name());
+				stmt.setInt(3, account.getAccountType().getId());
+				stmt.setString(4, account.getAccountNumber());
+				stmt.executeUpdate();
+			}
 
-	        // Remove old customer mappings
-	        try (PreparedStatement deleteStmt = conn.prepareStatement(deleteCustomerMapSql)) {
-	            deleteStmt.setInt(1, accountId);
-	            deleteStmt.executeUpdate();
-	        }
+			// Remove old customer mappings
+			try (PreparedStatement deleteStmt = conn.prepareStatement(deleteCustomerMapSql)) {
+				deleteStmt.setInt(1, accountId);
+				deleteStmt.executeUpdate();
+			}
 
-	        // Add new customer mappings
-	        try (PreparedStatement insertStmt = conn.prepareStatement(insertCustomerMapSql)) {
-	            for (Integer customerId : customerIds) {
-	                insertStmt.setInt(1, accountId);
-	                insertStmt.setInt(2, customerId);
-	                insertStmt.addBatch();
-	            }
-	            insertStmt.executeBatch();
-	        }
+			// Add new customer mappings
+			try (PreparedStatement insertStmt = conn.prepareStatement(insertCustomerMapSql)) {
+				for (Integer customerId : customerIds) {
+					insertStmt.setInt(1, accountId);
+					insertStmt.setInt(2, customerId);
+					insertStmt.addBatch();
+				}
+				insertStmt.executeBatch();
+			}
 
-	        conn.commit();
-	        return true;
+			conn.commit();
+			return true;
 
-	    } catch (SQLException ex) {
-	        ex.printStackTrace();
-	        return false;
-	    }
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			return false;
+		}
 	}
 
-
 	private int getAccountIdByAccountNumber(String accountNumber, Connection conn) throws SQLException {
-	    String sql = "SELECT account_id FROM accounts WHERE account_number = ?";
-	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        stmt.setString(1, accountNumber);
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                return rs.getInt("account_id");
-	            }
-	        }
-	    }
-	    return -1;
+		String sql = "SELECT account_id FROM accounts WHERE account_number = ?";
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setString(1, accountNumber);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt("account_id");
+				}
+			}
+		}
+		return -1;
 	}
 
 	public List<FixedDetail> getAllFixedAccountDetail() {
@@ -379,18 +376,20 @@ public class AccountRepository {
 				WHERE at.account_type LIKE 'FIXED_%';
 				""";
 		List<FixedDetail> details = new ArrayList<>();
-		
-		try(var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
+
+		try (var con = DatabaseConfig.getConnection(); var stmt = con.prepareStatement(sql)) {
 			var rs = stmt.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				int accountId = rs.getInt("account_id");
 				BigDecimal balance = rs.getBigDecimal("balance");
 				Type accountType = Type.valueOf(rs.getString("account_type"));
 				Timestamp createdAt = rs.getTimestamp("created_at");
 				BigDecimal percentPerAnnum = rs.getBigDecimal("interest_rate");
 				int duration = rs.getInt("duration_days");
-				LocalDate dueDate = createdAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plusDays(duration);
-				FixedDetail detail = new FixedDetail(accountId, balance, accountType, dueDate, percentPerAnnum, duration);
+				LocalDate dueDate = createdAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+						.plusDays(duration);
+				FixedDetail detail = new FixedDetail(accountId, balance, accountType, dueDate, percentPerAnnum,
+						duration);
 				details.add(detail);
 			}
 		} catch (Exception e) {
